@@ -1,7 +1,7 @@
 package com.example.order.service;
 
 import com.example.order.dto.OrderDto;
-import com.example.order.dto.convertor.OrderConvertor;
+import com.example.order.dto.mapper.OrderMapper;
 import com.example.order.model.Order;
 import com.example.order.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,6 @@ public class OrderService {
     }
 
     public Order save(OrderDto orderDto) {
-        return orderRepository.save(OrderConvertor.toOrder(orderDto));
+        return orderRepository.save(OrderMapper.toOrder(orderDto));
     }
 }

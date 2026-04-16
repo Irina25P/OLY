@@ -1,10 +1,10 @@
-package com.example.order.dto.convertor;
+package com.example.order.dto.mapper;
 
 import com.example.order.dto.OrderDto;
 import com.example.order.model.Order;
 import com.example.order.model.User;
 
-public class OrderConvertor {
+public class OrderMapper {
 
     public static Order toOrder(OrderDto orderDto) {
         User user = null;
