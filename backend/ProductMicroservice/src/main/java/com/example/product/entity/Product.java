@@ -12,7 +12,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.UUID;
 
 @Entity
-@Table(name="product")
+@Table(name="products")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,10 +20,13 @@ public class Product {
     @Id
     @UuidGenerator
     private UUID id;
+
     @Column(nullable=false, name = "name")
     private String name;
+
     @Column(nullable=false, name = "price")
     private Double price;
+
     @Column(nullable=false, name = "stock")
     private Integer stock;
 }
