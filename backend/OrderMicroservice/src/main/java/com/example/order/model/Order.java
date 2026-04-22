@@ -21,12 +21,21 @@ public class Order {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "client_id")
+    private User client;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
+    private User seller;
 
     @Column(name = "status_type")
+    @Enumerated(EnumType.STRING)
     private OrderStatus statusType;
 
     @Column(name = "payment")
+    @Enumerated(EnumType.STRING)
     private PaymentMethod payment;
+
+    @Column(name = "shipping_details")
+    private String shippingDetails;
 }
