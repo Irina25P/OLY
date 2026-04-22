@@ -16,7 +16,7 @@ public class SellerMessageDTO {
     private String name;
     private String email;
     private String username;
-    private String logoURL;
+    private String imageName;
     private String description;
     private String region;
 }
