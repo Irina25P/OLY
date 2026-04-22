@@ -18,5 +18,5 @@ public class Product {
     private UUID id;
 
     @Column(name = "price")
-    private double price;
+    private Double price;
 }
