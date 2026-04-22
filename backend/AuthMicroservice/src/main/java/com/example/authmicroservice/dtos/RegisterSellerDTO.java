@@ -25,7 +25,7 @@ public class RegisterSellerDTO {
     @NotBlank(message = "Password is required")
     private String password;
 
-    private String logoURL;
+    private String imageName;
     private String description;
     private String region;
 }

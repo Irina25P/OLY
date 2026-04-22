@@ -14,7 +14,7 @@ public class SellerMessageMapper {
                 dto.getName(),
                 dto.getEmail(),
                 dto.getUsername(),
-                dto.getLogoURL(),
+                dto.getImageName(),
                 dto.getDescription(),
                 dto.getRegion()
         );
