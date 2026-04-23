@@ -1,0 +1,218 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "8080:8080"
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - my_net
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - my_net
+
+  auth-service:
+    build:
+      context: ./backend/AuthMicroservice
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: always
+    environment:
+      DB_IP: 92.5.49.167
+      DB_PORT: 5432
+      DB_DBNAME: db_auth
+      DB_USER: admin
+      DB_PASSWORD: admin
+      PORT: 8080
+      TZ: UTC
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - my_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-router.rule=PathPrefix(`/api/v1/auth`)"
+      - "traefik.http.routers.auth-router.entrypoints=web"
+      - "traefik.http.middlewares.auth-strip.stripprefix.prefixes=/api"
+      - "traefik.http.routers.auth-router.middlewares=auth-strip"
+      - "traefik.http.services.auth-service.loadbalancer.server.port=8080"
+
+  user-service:
+    build:
+      context: ./backend/UserMicroservice
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: always
+    environment:
+      DB_IP: 92.5.49.167
+      DB_PORT: 5432
+      DB_DBNAME: db_users
+      DB_USER: admin
+      DB_PASSWORD: admin
+      PORT: 8080
+      TZ: UTC
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - my_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.user-router.rule=PathPrefix(`/api/v1/users`)"
+      - "traefik.http.routers.user-router.entrypoints=web"
+      - "traefik.http.middlewares.user-strip.stripprefix.prefixes=/api"
+      - "traefik.http.routers.user-router.middlewares=user-strip"
+      - "traefik.http.services.user-service.loadbalancer.server.port=8080"
+
+  product-service:
+    build:
+      context: ./backend/ProductMicroservice
+      dockerfile: Dockerfile
+    container_name: product-service
+    restart: always
+    environment:
+      DB_IP: 92.5.49.167
+      DB_PORT: 5432
+      DB_DBNAME: db_products
+      DB_USER: admin
+      DB_PASSWORD: admin
+      PORT: 8080
+      TZ: UTC
+    networks:
+      - my_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.product-router.rule=PathPrefix(`/api/v1/products`)"
+      - "traefik.http.routers.product-router.entrypoints=web"
+      - "traefik.http.middlewares.product-strip.stripprefix.prefixes=/api"
+      - "traefik.http.routers.product-router.middlewares=product-strip"
+      - "traefik.http.services.product-service.loadbalancer.server.port=8080"
+
+  order-service:
+    build:
+      context: ./backend/OrderMicroservice
+      dockerfile: Dockerfile
+    container_name: order-service
+    restart: always
+    environment:
+      DB_IP: 92.5.49.167
+      DB_PORT: 5432
+      DB_DBNAME: db_orders
+      DB_USER: admin
+      DB_PASSWORD: admin
+      PORT: 8080
+      TZ: UTC
+    networks:
+      - my_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.order-router.rule=PathPrefix(`/api/v1/orders`)"
+      - "traefik.http.routers.order-router.entrypoints=web"
+      - "traefik.http.middlewares.order-strip.stripprefix.prefixes=/api"
+      - "traefik.http.routers.order-router.middlewares=order-strip"
+      - "traefik.http.services.order-service.loadbalancer.server.port=8080"
+
+  image-service:
+    build:
+      context: ./backend/ImageManagementMicroservice
+      dockerfile: Dockerfile
+    container_name: image-service
+    restart: always
+    environment:
+      DB_IP: 92.5.49.167
+      DB_PORT: 5432
+      DB_DBNAME: db_images
+      DB_USER: admin
+      DB_PASSWORD: admin
+      PORT: 8080
+      TZ: UTC
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: adminadmin
+    depends_on:
+      - minio
+    networks:
+      - my_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.image-router.rule=PathPrefix(`/api/v1/images`)"
+      - "traefik.http.routers.image-router.entrypoints=web"
+      - "traefik.http.middlewares.image-strip.stripprefix.prefixes=/api"
+      - "traefik.http.routers.image-router.middlewares=image-strip"
+      - "traefik.http.services.image-service.loadbalancer.server.port=8080"
+    
+  notification-service:
+    build:
+      context: ./backend/NotificationMicroservice
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: always
+    environment:
+      DB_IP: 92.5.49.167
+      DB_PORT: 5432
+      DB_DBNAME: db_notifications
+      DB_USER: admin
+      DB_PASSWORD: admin
+      PORT: 8080
+      TZ: UTC
+    networks:
+      - my_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.notification-router.rule=PathPrefix(`/api/v1/notification`)"
+      - "traefik.http.routers.notification-router.entrypoints=web"
+      - "traefik.http.middlewares.notification-strip.stripprefix.prefixes=/api"
+      - "traefik.http.routers.notification-router.middlewares=notification-strip"
+      - "traefik.http.services.notification-service.loadbalancer.server.port=8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    depends_on:
+      - auth-service
+      - user-service
+      - product-service
+      - order-service
+      - image-service
+    networks:
+      - my_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+volumes:
+  rabbitmq_data:
+  minio_data:
+
+networks:
+  my_net:
+    driver: bridge
