@@ -24,7 +24,7 @@ public class SellerReplyService {
     private final UserRepository userRepository;
 
     public SellerReplyDetailDTO createReply(CreateSellerReplyRequest request, UUID userId) {
-        if (sellerReplyRepository.findByReviewIdAndUserId(request.getReviewId(), userId).isEmpty()) {
+        if (sellerReplyRepository.findByReviewIdAndUserId(request.getReviewId(), userId).isPresent()) {
             throw new SellerReplyException("User has already replied to this product");
         }
 
@@ -33,6 +33,10 @@ public class SellerReplyService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ReviewException("User not found with id: " + userId));
+
+        if (review.getProduct().getSellerId() != userId) {
+            throw new SellerReplyException("User is not the seller of this product");
+        }
 
         SellerReply sellerReply = new SellerReply();
         sellerReply.setReview(review);

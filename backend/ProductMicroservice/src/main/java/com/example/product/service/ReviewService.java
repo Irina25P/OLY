@@ -35,7 +35,7 @@ public class ReviewService {
             throw new ReviewException("Rating must be between " + MIN_RATING + " and " + MAX_RATING);
         }
 
-        if (reviewRepository.findByProductIdAndUserId(request.getProductId(), userId).isEmpty()) {
+        if (reviewRepository.findByProductIdAndUserId(request.getProductId(), userId).isPresent()) {
             throw new ReviewException("User has already reviewed this product");
         }
 
@@ -70,12 +70,16 @@ public class ReviewService {
 
         for (Review review : reviews) {
             SellerReply reply = sellerReplyRepository.findByReviewId(review.getId());
-            SellerReplyDetailDTO replyDetailDTO = SellerReplyDetailDTO.builder()
-                    .id(reply.getId())
-                    .sellerId(reply.getUser().getId())
-                    .reply(reply.getReply())
-                    .createdAt(reply.getCreatedAt()).build();
 
+            SellerReplyDetailDTO replyDetailDTO = null;
+
+            if (reply != null) {
+                replyDetailDTO = SellerReplyDetailDTO.builder()
+                        .id(reply.getId())
+                        .sellerId(reply.getUser().getId())
+                        .reply(reply.getReply())
+                        .createdAt(reply.getCreatedAt()).build();
+            }
             ReviewDetailDTO reviewDetailDTO = ReviewDetailDTO.builder()
                     .id(review.getId())
                     .clientId(review.getUser().getId())
@@ -96,5 +100,10 @@ public class ReviewService {
             throw new ReviewException("User is not authorized to delete this review");
         }
         reviewRepository.deleteById(reviewId);
+    }
+
+    public Double getAverageRatingByProductId(UUID productId) {
+        Double avg = reviewRepository.getAverageRatingByProductId(productId);
+        return avg == null ? 0.0 : avg;
     }
 }

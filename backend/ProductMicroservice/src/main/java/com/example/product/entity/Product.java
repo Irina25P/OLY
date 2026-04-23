@@ -1,14 +1,10 @@
 package com.example.product.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,17 +12,40 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Product {
     @Id
     @UuidGenerator
     private UUID id;
+    @Column(nullable = false, name = "title")
+    private String title;
+
+    @Column(nullable = false, name = "description")
+    private String description;
+
+    @Column(nullable = false, name = "price")
+    private Double price;
+
 
     @Column(nullable=false, name = "name")
     private String name;
 
-    @Column(nullable=false, name = "price")
-    private Double price;
-
     @Column(nullable=false, name = "stock")
     private Integer stock;
+
+    @ElementCollection
+    @CollectionTable(name = "entity_images", joinColumns = @JoinColumn(name = "entity_id"))
+    @Column(name = "image_name")
+    private List<String> imageNames;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "category")
+    private InterestType category;
+
+    @Column(nullable = false, name = "available")
+    private Boolean available;
+
+    @Column(nullable = false, name = "sellerId")
+    private UUID sellerId;
 }
