@@ -20,7 +20,7 @@ public class ClientMessageConsumer {
         this.clientService = clientService;
     }
 
-    @RabbitListener(queues = "addUser-Topic-Exchange.user-microservice.client")
+    @RabbitListener(queues = "${rabbitmq.sync.exchange.adduser}.${rabbitmq.sync.unique.name}.${rabbitmq.sync.routingkey.client}")
     public void consumeClientMessage(ClientDTO message) {
         try {
             Client client = new Client();

@@ -1,6 +1,6 @@
 package org.example.usermicroservice.services;
 
-import org.example.usermicroservice.dtos.DeleteImageDTO;
+import org.example.usermicroservice.dtos.DeleteImagesDTO;
 import org.example.usermicroservice.dtos.DeleteUserDTO;
 import org.example.usermicroservice.dtos.SellerDTO;
 import org.example.usermicroservice.dtos.mapper.SellerMapper;
@@ -10,6 +10,9 @@ import org.example.usermicroservice.messaging.producer.DeleteUserProducer;
 import org.example.usermicroservice.repositories.SellerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -46,7 +49,7 @@ public class SellerService {
         
         if (oldImageName != null && !oldImageName.isEmpty() &&
             (newImageName == null || !newImageName.equals(oldImageName))) {
-            DeleteImageDTO deleteImageMessage = new DeleteImageDTO(oldImageName);
+            DeleteImagesDTO deleteImageMessage = new DeleteImagesDTO(List.of(oldImageName));
             deleteImageProducer.sendDeleteImageMessage(deleteImageMessage);
         }
         
@@ -65,7 +68,7 @@ public class SellerService {
         deleteUserProducer.sendDeleteUserMessage(deleteMessage);
         
         if (imageName != null && !imageName.isEmpty()) {
-            DeleteImageDTO deleteImageMessage = new DeleteImageDTO(imageName);
+            DeleteImagesDTO deleteImageMessage = new DeleteImagesDTO(List.of(imageName));
             deleteImageProducer.sendDeleteImageMessage(deleteImageMessage);
         }
     }

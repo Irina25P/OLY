@@ -2,10 +2,15 @@ package com.example.order.controller;
 
 import com.example.order.dto.OrderDto;
 import com.example.order.dto.OrderFullDto;
+import com.example.order.dto.OrderStatusUpdateDto;
 import com.example.order.service.OrderService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,8 +46,25 @@ public class OrderController {
         return ResponseEntity.ok(fullOrder);
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping()
-    public ResponseEntity<String> save(@Valid @RequestBody OrderFullDto request) {
-        return ResponseEntity.status(201).body(orderService.save(request.getOrder(), request.getOrderProducts()));
+    @ResponseStatus(HttpStatus.CREATED)
+    public String save(@Valid @RequestBody OrderFullDto request) {
+        return orderService.save(request.getOrder(), request.getOrderProducts());
+    }
+
+    @PreAuthorize("hasRole('SELLER')")
+    @PutMapping()
+    public ResponseEntity<String> update(@Valid @RequestBody OrderStatusUpdateDto request, @RequestHeader(name = "${security.user-id-header}") String userId) {
+        try{
+           String result = orderService.updateOrderStatus(request, UUID.fromString(userId));
+
+           return ResponseEntity.ok(result);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+
     }
 }

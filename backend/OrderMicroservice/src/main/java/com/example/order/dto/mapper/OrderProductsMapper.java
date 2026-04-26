@@ -1,9 +1,9 @@
 package com.example.order.dto.mapper;
 
 import com.example.order.dto.OrderProductDto;
-import com.example.order.model.Order;
-import com.example.order.model.OrderProducts;
-import com.example.order.model.Product;
+import com.example.order.entities.Order;
+import com.example.order.entities.OrderProducts;
+import com.example.order.entities.Product;
 
 public class OrderProductsMapper {
     public static OrderProducts toOrderProducts(OrderProductDto dto)

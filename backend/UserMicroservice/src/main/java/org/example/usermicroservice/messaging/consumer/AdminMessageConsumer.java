@@ -5,10 +5,14 @@ import org.example.usermicroservice.dtos.mapper.AdminMapper;
 import org.example.usermicroservice.entities.Admin;
 import org.example.usermicroservice.services.AdminService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AdminMessageConsumer {
+
+    @Value("${rabbitmq.sync.unique.name}")
+    private String uniqueName;
 
     private final AdminService adminService;
 
@@ -16,7 +20,7 @@ public class AdminMessageConsumer {
         this.adminService = adminService;
     }
 
-    @RabbitListener(queues = "addUser-Topic-Exchange.user-microservice.admin")
+    @RabbitListener(queues = "${rabbitmq.sync.exchange.adduser}.${rabbitmq.sync.unique.name}.${rabbitmq.sync.routingkey.admin}")
     public void consumeAdminMessage(AdminDTO message) {
         try {
             Admin admin = AdminMapper.toEntity(message);

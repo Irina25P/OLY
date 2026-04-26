@@ -20,7 +20,7 @@ public class DeleteUserConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "${rabbitmq.sync.exchange.deleteUser.topic}.${rabbitmq.sync.queue.unique.name}")
+    @RabbitListener(queues = "${rabbitmq.sync.exchange.deleteUser.topic}.${rabbitmq.sync.unique.name}.${rabbitmq.sync.routingkey.deleteUser}")
     public void consumeDeleteUserMessage(String message) {
         try {
             LOGGER.info("Received deleteUser message: {}", message);

@@ -1,7 +1,7 @@
 package com.example.order.repository;
 
-import com.example.order.model.Order;
-import com.example.order.model.User;
+import com.example.order.entities.Order;
+import com.example.order.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

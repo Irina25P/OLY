@@ -11,25 +11,25 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${rabbitmq.sync.exchange.deleteuser:deleteUser-Topic-Exchange}")
+    @Value("${rabbitmq.sync.exchange.deleteuser}")
     private String deleteUserExchange;
 
-    @Value("${rabbitmq.sync.exchange.adduser:addUser-Topic-Exchange}")
+    @Value("${rabbitmq.sync.exchange.adduser}")
     private String addUserExchange;
 
-    @Value("${rabbitmq.sync.exchange.deleteimage:deleteImage-Topic-Exchange}")
+    @Value("${rabbitmq.sync.exchange.deleteimage}")
     private String deleteImageExchange;
 
-    @Value("${rabbitmq.sync.routingkey.admin:addUser.admin}")
+    @Value("${rabbitmq.sync.routingkey.admin}")
     private String adminRoutingKey;
 
-    @Value("${rabbitmq.sync.routingkey.seller:addUser.seller}")
+    @Value("${rabbitmq.sync.routingkey.seller}")
     private String sellerRoutingKey;
 
-    @Value("${rabbitmq.sync.routingkey.client:addUser.client}")
+    @Value("${rabbitmq.sync.routingkey.client}")
     private String clientRoutingKey;
 
-    @Value("${rabbitmq.sync.unique.name:user-microservice}")
+    @Value("${rabbitmq.sync.unique.name}")
     private String uniqueName;
 
     @Bean
@@ -49,7 +49,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue adminQueue() {
-        return new Queue("addUser-Topic-Exchange." + uniqueName + ".admin", true);
+        return new Queue(addUserExchange + "." + uniqueName + "." + adminRoutingKey, true);
     }
 
     @Bean
@@ -61,7 +61,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue sellerQueue() {
-        return new Queue("addUser-Topic-Exchange." + uniqueName + ".seller", true);
+        return new Queue(addUserExchange + "." + uniqueName + "." + sellerRoutingKey, true);
     }
 
     @Bean
@@ -73,7 +73,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue clientQueue() {
-        return new Queue("addUser-Topic-Exchange." + uniqueName + ".client", true);
+        return new Queue(addUserExchange + "." + uniqueName + "." + clientRoutingKey, true);
     }
 
     @Bean

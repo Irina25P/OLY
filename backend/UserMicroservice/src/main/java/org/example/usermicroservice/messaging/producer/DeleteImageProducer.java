@@ -1,6 +1,6 @@
 package org.example.usermicroservice.messaging.producer;
 
-import org.example.usermicroservice.dtos.DeleteImageDTO;
+import org.example.usermicroservice.dtos.DeleteImagesDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,10 @@ public class DeleteImageProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendDeleteImageMessage(DeleteImageDTO message) {
+    public void sendDeleteImageMessage(DeleteImagesDTO message) {
         try {
             rabbitTemplate.convertAndSend(deleteImageExchange, deleteImageRoutingKey, message);
-            System.out.println("Delete image message sent for image: " + message.getImageName());
+            System.out.println("Delete image message sent");
         } catch (Exception e) {
             System.err.println("Error sending delete image message: " + e.getMessage());
             e.printStackTrace();

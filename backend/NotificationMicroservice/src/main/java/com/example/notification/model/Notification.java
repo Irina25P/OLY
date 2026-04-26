@@ -7,20 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
-@Table(name = "notifications")
-@Entity
+@Embeddable // No longer an Entity, no separate identity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class Notification {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID id;
 
     @Column(name = "message", nullable = false)
     private String message;

@@ -1,4 +1,4 @@
-package com.example.order.model;
+package com.example.order.entities;
 
 
 import jakarta.persistence.*;
@@ -7,16 +7,13 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "product_id")
+@Table(name = "user_id")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class Product {
+public class User {
     @Id
     @Column(name = "id")
     private UUID id;
-
-    @Column(name = "price")
-    private Double price;
 }

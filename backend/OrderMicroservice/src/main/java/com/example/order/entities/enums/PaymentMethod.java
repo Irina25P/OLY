@@ -1,4 +1,4 @@
-package com.example.order.model.enums;
+package com.example.order.entities.enums;
 
 public enum PaymentMethod {
     CARD,

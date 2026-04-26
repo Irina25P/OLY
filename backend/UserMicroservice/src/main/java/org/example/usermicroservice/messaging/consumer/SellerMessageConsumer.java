@@ -16,7 +16,7 @@ public class SellerMessageConsumer {
         this.sellerService = sellerService;
     }
 
-    @RabbitListener(queues = "addUser-Topic-Exchange.user-microservice.seller")
+    @RabbitListener(queues = "${rabbitmq.sync.exchange.adduser}.${rabbitmq.sync.unique.name}.${rabbitmq.sync.routingkey.seller}")
     public void consumeSellerMessage(SellerDTO message) {
         try {
             Seller seller = SellerMapper.toEntity(message);

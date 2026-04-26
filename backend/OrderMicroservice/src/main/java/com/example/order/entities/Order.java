@@ -1,8 +1,8 @@
-package com.example.order.model;
+package com.example.order.entities;
 
 
-import com.example.order.model.enums.OrderStatus;
-import com.example.order.model.enums.PaymentMethod;
+import com.example.order.entities.enums.OrderStatus;
+import com.example.order.entities.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +36,12 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private PaymentMethod payment;
 
-    @Column(name = "shipping_details")
-    private String shippingDetails;
+    @Column(name = "county")
+    private String county;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "street")
+    private String street;
 }

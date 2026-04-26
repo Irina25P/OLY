@@ -66,6 +66,8 @@ Then send:
 }
 ```
 
+When creating an order, each requested product quantity is checked against the current `Product.stock`. If any product does not have enough stock, the request is rejected and nothing is saved.
+
 ### `OrderFullDto`
 ```json
 {

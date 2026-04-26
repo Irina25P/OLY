@@ -20,6 +20,10 @@ public class User {
     @Column(name = "id")
     private UUID id;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ElementCollection
+    @CollectionTable(
+            name = "user_notifications",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
     private List<Notification> notifications;
 }
