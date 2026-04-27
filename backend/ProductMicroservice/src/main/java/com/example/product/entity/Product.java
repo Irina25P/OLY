@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,8 +19,6 @@ public class Product {
     @Id
     @UuidGenerator
     private UUID id;
-    @Column(nullable = false, name = "title")
-    private String title;
 
     @Column(nullable = false, name = "description")
     private String description;
@@ -37,15 +36,16 @@ public class Product {
     @ElementCollection
     @CollectionTable(name = "entity_images", joinColumns = @JoinColumn(name = "entity_id"))
     @Column(name = "image_name")
-    private List<String> imageNames;
+    private List<String> imageNames = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "category")
     private InterestType category;
 
-    @Column(nullable = false, name = "available")
-    private Boolean available;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sellerId")
+    private User seller;
 
-    @Column(nullable = false, name = "sellerId")
-    private UUID sellerId;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<Review> reviews = new ArrayList<>();
 }

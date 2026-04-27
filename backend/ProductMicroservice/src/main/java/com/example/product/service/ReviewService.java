@@ -14,6 +14,8 @@ import com.example.product.repository.SellerReplyRepository;
 import com.example.product.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.product.rabbitmq.producer.ProductEventProducer;
+import com.example.product.rabbitmq.dto.NotificationMessageDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final SellerReplyRepository sellerReplyRepository;
+    private final ProductEventProducer productEventProducer;
     private static final int MIN_RATING = 1;
     private static final int MAX_RATING = 5;
 
@@ -53,6 +56,14 @@ public class ReviewService {
         review.setCreatedAt(LocalDateTime.now());
 
         Review savedReview = reviewRepository.save(review);
+
+        productEventProducer.sendReviewCreatedNotification(
+                new NotificationMessageDto(
+                        product.getSeller().getId(),
+                        "A review has been created for product: " + product.getName()
+                )
+        );
+
         return ReviewDetailDTO.builder()
                 .id(savedReview.getId())
                 .clientId(savedReview.getUser().getId())

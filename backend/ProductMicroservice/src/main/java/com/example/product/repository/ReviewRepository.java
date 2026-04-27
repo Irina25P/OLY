@@ -16,6 +16,10 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     Optional<Review> findByProductIdAndUserId(UUID productId, UUID userId);
 
+    void deleteByUserId(UUID userId);
+
+    void deleteByProductId(UUID productId);
+
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.product.id = :productId")
     Double getAverageRatingByProductId(@Param("productId") UUID productId);
 }

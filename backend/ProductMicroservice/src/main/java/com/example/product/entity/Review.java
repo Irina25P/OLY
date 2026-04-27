@@ -22,11 +22,11 @@ public class Review {
     @Column(nullable=false)
 	private Integer rating;
 
-	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -34,4 +34,7 @@ public class Review {
 
     @Column(nullable=false)
     private LocalDateTime createdAt;
+
+    @OneToOne(mappedBy = "review", cascade = CascadeType.REMOVE)
+    private SellerReply sellerReply;
 }

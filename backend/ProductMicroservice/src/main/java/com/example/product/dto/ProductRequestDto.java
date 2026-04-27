@@ -12,11 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductRequestDto {
 
-    private String title;
+    private String name;
     private String description;
     private Double price;
     private Integer stock;
     private List<String> imageNames;
     private InterestType category;
-    private Boolean available;
 }

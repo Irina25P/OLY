@@ -1,5 +1,6 @@
 package com.example.product.repository;
 
+import com.example.product.entity.Product;
 import com.example.product.entity.SellerReply;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,4 +14,8 @@ public interface SellerReplyRepository extends JpaRepository<SellerReply, UUID> 
     SellerReply findByReviewId(UUID reviewId);
 
     Optional<SellerReply> findByReviewIdAndUserId(UUID reviewId, UUID userId);
+
+    void deleteByUserId(UUID userId);
+
+    void deleteByReviewId(UUID reviewId);
 }

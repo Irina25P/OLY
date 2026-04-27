@@ -34,7 +34,7 @@ public class SellerReplyService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ReviewException("User not found with id: " + userId));
 
-        if (review.getProduct().getSellerId() != userId) {
+        if (!review.getProduct().getSeller().getId().equals(userId)) {
             throw new SellerReplyException("User is not the seller of this product");
         }
 

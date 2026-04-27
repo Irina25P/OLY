@@ -14,12 +14,11 @@ import java.util.UUID;
 public class ProductResponseDto {
 
     private UUID id;
-    private String title;
+    private String name;
     private String description;
     private Double price;
     private Integer stock;
     private List<String> imageUrls;
     private InterestType category;
-    private Boolean available;
     private Double averageRating;
 }

@@ -21,15 +21,14 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> getAllProducts(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) InterestType category,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) List<InterestType> categories,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) Double minRating,
-            @RequestParam(required = false) Boolean available
+            @RequestParam(required = false) Double minRating
     ) {
         return ResponseEntity.ok(
-                productService.getAllProducts(title, category, minPrice, maxPrice, minRating, available)
+                productService.getAllProducts(name, categories, minPrice, maxPrice, minRating)
         );
     }
 
@@ -76,12 +75,13 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('SELLER')")
-    @PatchMapping("/{id}/availability")
-    public ResponseEntity<ProductResponseDto> updateAvailability(@RequestHeader(name = "${security.user-id-header}") String userId,
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<ProductResponseDto> deleteImageFromProduct(
+            @RequestHeader(name = "${security.user-id-header}") String userId,
             @PathVariable UUID id,
-            @RequestParam Boolean available
+            @RequestParam String imageName
     ) {
         UUID sellerId = UUID.fromString(userId);
-        return ResponseEntity.ok(productService.updateAvailability(id, available, sellerId));
+        return ResponseEntity.ok(productService.deleteImageFromProduct(id, imageName, sellerId));
     }
 }

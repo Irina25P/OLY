@@ -1,12 +1,17 @@
 package com.example.product.service;
-
+import com.example.product.rabbitmq.dto.ChangedStockMessageDto;
+import com.example.product.rabbitmq.dto.DeleteImageMessageDto;
+import com.example.product.rabbitmq.producer.ProductEventProducer;
 import com.example.product.dto.*;
 import com.example.product.entity.*;
 import com.example.product.entity.Product;
+import com.example.product.rabbitmq.dto.OrderStockUpdateMessageDto;
 import com.example.product.repository.ProductRepository;
+import com.example.product.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,29 +21,27 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ReviewService reviewService;
+    private final ProductEventProducer productEventProducer;
+    private final UserRepository userRepository;
 
     public List<ProductResponseDto> getAllProducts(
-            String title,
-            InterestType category,
+            String name,
+            List<InterestType> categories,
             Double minPrice,
             Double maxPrice,
-            Double minRating,
-            Boolean available
+            Double minRating
     ) {
         List<Product> products = productRepository.findAll();
 
         return products.stream()
-                .filter(product -> title == null || title.isBlank()
-                        || product.getTitle().toLowerCase().contains(title.toLowerCase()))
-                .filter(product -> category == null
-                        || product.getCategory() == category)
+                .filter(product -> name == null || name.isBlank()
+                        || product.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(product -> categories == null
+                        || categories.contains(product.getCategory()))
                 .filter(product -> minPrice == null
                         || product.getPrice() >= minPrice)
                 .filter(product -> maxPrice == null
                         || product.getPrice() <= maxPrice)
-                .filter(product -> available == null
-                        ? Boolean.TRUE.equals(product.getAvailable())
-                        : product.getAvailable().equals(available))
                 .filter(product -> minRating == null
                         || reviewService.getAverageRatingByProductId(product.getId()) >= minRating)
                 .map(this::mapToResponseDto)
@@ -55,17 +58,28 @@ public class ProductService {
     public ProductResponseDto createProduct(ProductRequestDto dto, UUID sellerId) {
         validateProduct(dto);
 
+        User seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
         Product product = new Product();
-        product.setSellerId(sellerId);
-        product.setTitle(dto.getTitle());
+        seller.setId(sellerId);
+        product.setSeller(seller);
+        product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
         product.setCategory(dto.getCategory());
-        product.setAvailable(true);
         product.setImageNames(dto.getImageNames());
 
         Product savedProduct = productRepository.save(product);
+        productEventProducer.sendProductCreated(
+                new ChangedStockMessageDto(
+                        savedProduct.getId(),
+                        savedProduct.getStock(),
+                        savedProduct.getPrice()
+                )
+        );
+
         return mapToResponseDto(savedProduct);
     }
 
@@ -75,20 +89,38 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (!product.getSellerId().equals(sellerId)) {
+        if (!product.getSeller().getId().equals(sellerId)) {
             throw new RuntimeException("You are not allowed to update this product");
         }
 
-        product.setSellerId(sellerId);
-        product.setTitle(dto.getTitle());
+        List<String> oldImages = product.getImageNames();
+
+        product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
         product.setCategory(dto.getCategory());
-        product.setAvailable(dto.getAvailable());
         product.setImageNames(dto.getImageNames());
 
         Product updatedProduct = productRepository.save(product);
+        productEventProducer.sendProductUpdated(
+                new ChangedStockMessageDto(
+                        updatedProduct.getId(),
+                        updatedProduct.getStock(),
+                        updatedProduct.getPrice()
+                )
+        );
+
+        List<String> imagesToBeDeleted = new ArrayList<>();
+        for (String oldImage : oldImages) {
+            if (!product.getImageNames().contains(oldImage)) {
+                imagesToBeDeleted.add(oldImage);
+            }
+        }
+
+        DeleteImageMessageDto deleteImageMessageDto = new DeleteImageMessageDto(imagesToBeDeleted);
+        productEventProducer.sendImageDeleted(deleteImageMessageDto);
+
         return mapToResponseDto(updatedProduct);
     }
 
@@ -96,9 +128,20 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (!product.getSellerId().equals(sellerId)) {
+        if (!product.getSeller().getId().equals(sellerId)) {
             throw new RuntimeException("You are not allowed to delete this product");
         }
+
+        productEventProducer.sendImageDeleted(new DeleteImageMessageDto(product.getImageNames()));
+
+        productEventProducer.sendProductDeleted(
+                new ChangedStockMessageDto(
+                        product.getId(),
+                        product.getStock(),
+                        product.getPrice()
+                )
+        );
+
 
         productRepository.delete(product);
     }
@@ -111,37 +154,52 @@ public class ProductService {
             throw new RuntimeException("Stock must be 0 or greater");
         }
 
-        if (!product.getSellerId().equals(sellerId)) {
+        if (!product.getSeller().getId().equals(sellerId)) {
             throw new RuntimeException("You are not allowed to update this product");
         }
 
         product.setStock(stock);
 
         Product updatedProduct = productRepository.save(product);
+
+        productEventProducer.sendProductUpdated(
+                new ChangedStockMessageDto(
+                        updatedProduct.getId(),
+                        updatedProduct.getStock(),
+                        updatedProduct.getPrice()
+                )
+        );
         return mapToResponseDto(updatedProduct);
     }
 
-    public ProductResponseDto updateAvailability(UUID id, Boolean available, UUID sellerId) {
-        Product product = productRepository.findById(id)
+    public ProductResponseDto deleteImageFromProduct(UUID productId, String imageName, UUID sellerId) {
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (!product.getSellerId().equals(sellerId)) {
+        if (!product.getSeller().getId().equals(sellerId)) {
             throw new RuntimeException("You are not allowed to update this product");
         }
 
-        if (available == null) {
-            throw new RuntimeException("Availability is required");
+        if (imageName == null || imageName.isBlank()) {
+            throw new RuntimeException("Image name is required");
         }
 
-        product.setAvailable(available);
+        if (product.getImageNames() == null || !product.getImageNames().remove(imageName)) {
+            throw new RuntimeException("Image not found for this product");
+        }
 
         Product updatedProduct = productRepository.save(product);
+
+        productEventProducer.sendImageDeleted(
+                new com.example.product.rabbitmq.dto.DeleteImageMessageDto(List.of(imageName))
+        );
+
         return mapToResponseDto(updatedProduct);
     }
 
     private void validateProduct(ProductRequestDto dto) {
-        if (dto.getTitle() == null || dto.getTitle().isBlank()) {
-            throw new RuntimeException("Title is required");
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new RuntimeException("name is required");
         }
 
         if (dto.getPrice() == null || dto.getPrice() <= 0) {
@@ -167,14 +225,30 @@ public class ProductService {
 
         return new ProductResponseDto(
                 product.getId(),
-                product.getTitle(),
+                product.getName(),
                 product.getDescription(),
                 product.getPrice(),
                 product.getStock(),
                 imageUrls,
                 product.getCategory(),
-                product.getAvailable(),
                 averageRating
         );
+    }
+
+    public void updateStockFromOrder(OrderStockUpdateMessageDto dto) {
+        if (dto.getProductId() == null) {
+            throw new RuntimeException("Product id is required");
+        }
+
+        if (dto.getStock() == null || dto.getStock() < 0) {
+            throw new RuntimeException("Stock must be 0 or greater");
+        }
+
+        Product product = productRepository.findById(dto.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setStock(dto.getStock());
+
+        productRepository.save(product);
     }
 }
