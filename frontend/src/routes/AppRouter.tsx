@@ -1,51 +1,58 @@
 import { Routes, Route } from "react-router-dom"
 import { AuthProvider } from "../context/AuthContext"
 import { ProtectedRoute } from "../components/ProtectedRoute"
+
 import MainLayout from "../components/layout/MainLayout"
+import SellerLayout from "../components/seller/SellerLayout"
+
 import HomePage from "../pages/public/HomePage"
 import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
 import DashboardPage from "../pages/dashboard/DashboardPage"
+import ProductCatalogPage from "../pages/product/ProductCatalogPage"
+
+import SellerOverviewPage from "../pages/seller/SellerOverviewPage"
+import SellerProductsPage from "../pages/seller/SellerProductsPage"
+import SellerOrdersPage from "../pages/seller/SellerOrdersPage"
+import SellerAnalyticsPage from "../pages/seller/SellerAnalyticsPage"
+import SellerReviewsPage from "../pages/seller/SellerReviewsPage"
+import SellerSettingsPage from "../pages/seller/SellerSettingsPage"
 
 function AppRouter() {
-  return (
-    <AuthProvider>
-      <Routes>
-        {/* Auth pages — no MainLayout, no authentication required */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    return (
+        <AuthProvider>
+            <Routes>
+                {/* Auth pages */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-        {/* App pages — with MainLayout */}
-        <Route element={<MainLayout />}>
-          {/* Public page */}
-          <Route path="/" element={<HomePage />} />
+                {/* Public buyer pages */}
+                <Route element={<MainLayout />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/products" element={<ProductCatalogPage />} />
 
-          {/* Protected pages — requires authentication */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                </Route>
 
-          {/* Role-specific routes examples (uncomment and add pages as needed) */}
-          {/* Client-only page */}
-          {/* <Route path="/orders" element={<ProtectedRoute allowedRoles={["CLIENT"]}><OrdersPage /></ProtectedRoute>} /> */}
-
-          {/* Seller-only page */}
-          {/* <Route path="/products" element={<ProtectedRoute allowedRoles={["SELLER"]}><ProductsPage /></ProtectedRoute>} /> */}
-
-          {/* Admin-only page */}
-          {/* <Route path="/admin" element={<ProtectedRoute allowedRoles={["ADMIN"]}><AdminPage /></ProtectedRoute>} /> */}
-
-          {/* Multiple roles allowed */}
-          {/* <Route path="/analytics" element={<ProtectedRoute allowedRoles={["ADMIN", "SELLER"]}><AnalyticsPage /></ProtectedRoute>} /> */}
-        </Route>
-      </Routes>
-    </AuthProvider>
-  )
+                {/* Seller dashboard pages */}
+                <Route element={<SellerLayout />}>
+                    <Route path="/seller" element={<SellerOverviewPage />} />
+                    <Route path="/seller/products" element={<SellerProductsPage />} />
+                    <Route path="/seller/orders" element={<SellerOrdersPage />} />
+                    <Route path="/seller/analytics" element={<SellerAnalyticsPage />} />
+                    <Route path="/seller/reviews" element={<SellerReviewsPage />} />
+                    <Route path="/seller/settings" element={<SellerSettingsPage />} />
+                </Route>
+            </Routes>
+        </AuthProvider>
+    )
 }
 
 export default AppRouter
