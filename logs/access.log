@@ -1,0 +1,2 @@
+172.18.0.1 - - [29/Apr/2026:18:15:22 +0000] "GET /api/v1/images HTTP/1.1" 405 284 "-" "-" 1 "image-management-api@file" "http://image-management-service:8080" 750ms
+172.18.0.1 - - [29/Apr/2026:18:15:23 +0000] "GET /favicon.ico HTTP/1.1" 200 627 "-" "-" 2 "frontend@file" "http://frontend:80" 7ms

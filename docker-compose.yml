@@ -255,10 +255,9 @@ services:
     networks:
       - oly_net
 
-
 volumes:
   rabbitmq-data:
 
 networks:
   oly_net:
-    driver: bridge
+    external: true

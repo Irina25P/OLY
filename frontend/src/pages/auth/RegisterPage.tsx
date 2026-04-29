@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, Store, Upload, X } from "lucide-react";
 import { api } from '../../services/api';
-import { useAuth } from "../../context/AuthContext";import { COUNTY_NAMES } from "../../models/romaniaData";import logo from "../../assets/logo.png";
+import { useAuth } from "../../context/AuthContext";import { COUNTY_NAMES, formatCountyForBackend } from "../../models/romaniaData";import logo from "../../assets/logo.png";
 
 type Role = "client" | "seller";
 
@@ -96,11 +96,6 @@ function RegisterPage() {
       return;
     }
 
-    if (logoFile === null) {
-      setError("Please upload a logo for your store.");
-      return;
-    }
-
     setLoading(true);
     try {
       if (role === "client") {
@@ -110,7 +105,7 @@ function RegisterPage() {
           email,
           username,
           password,
-          region: county,
+          county: formatCountyForBackend(county),
           age: age ? parseInt(age) : 18,
           phoneNumber: phoneNumber,
           interests: interests.length > 0 ? interests : [],
@@ -118,13 +113,21 @@ function RegisterPage() {
       } else {
         let imageName: string;
 
+        if (logoFile === null) {
+          setError("Please upload a logo for your store.");
+          return;
+        }
         
         const formData = new FormData();
         formData.append("file", logoFile);
         const uploadRes = await api.post<{ objectName: string }>(
           `v1/images`,
-          formData
-        );
+          formData,
+          {
+            headers: {
+              "Content-Type": undefined,
+            }
+        });
         imageName = uploadRes.data.objectName;
 
         await registerSeller({
@@ -134,7 +137,7 @@ function RegisterPage() {
           password,
           imageName,
           description: description,
-          region: sellerCounty,
+          county: formatCountyForBackend(sellerCounty),
         });
       }
       navigate("/login");
