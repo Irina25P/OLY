@@ -21,4 +21,5 @@ public class ProductResponseDto {
     private List<String> imageUrls;
     private InterestType category;
     private Double averageRating;
+    private UUID sellerId;
 }

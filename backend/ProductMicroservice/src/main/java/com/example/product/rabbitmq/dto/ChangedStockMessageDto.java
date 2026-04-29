@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangedStockMessageDto {
-    private UUID productId;
+    private UUID id;
     private Integer stock;
     private Double price;
 }

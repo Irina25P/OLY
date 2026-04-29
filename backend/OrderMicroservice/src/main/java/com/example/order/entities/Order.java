@@ -1,6 +1,7 @@
 package com.example.order.entities;
 
 
+import com.example.order.entities.enums.County;
 import com.example.order.entities.enums.OrderStatus;
 import com.example.order.entities.enums.PaymentMethod;
 import jakarta.persistence.*;
@@ -20,11 +21,11 @@ public class Order {
     @Column(name = "id")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
     private User client;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "seller_id")
     private User seller;
 
@@ -37,7 +38,7 @@ public class Order {
     private PaymentMethod payment;
 
     @Column(name = "county")
-    private String county;
+    private County county;
 
     @Column(name = "city")
     private String city;

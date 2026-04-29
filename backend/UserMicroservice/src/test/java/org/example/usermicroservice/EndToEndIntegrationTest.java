@@ -6,7 +6,7 @@ import org.example.usermicroservice.dtos.SellerDTO;
 import org.example.usermicroservice.entities.Client;
 import org.example.usermicroservice.entities.Interest;
 import org.example.usermicroservice.entities.InterestType;
-import org.example.usermicroservice.entities.Region;
+import org.example.usermicroservice.entities.County;
 import org.example.usermicroservice.entities.Seller;
 import org.example.usermicroservice.repositories.ClientRepository;
 import org.example.usermicroservice.repositories.SellerRepository;
@@ -93,14 +93,14 @@ public class EndToEndIntegrationTest {
         client.setFirstName("End");
         client.setLastName("ToEnd");
         client.setEmail("e2e@client.com");
-        client.setRegion(Region.BUCURESTI);
+        client.setCounty(County.BUCURESTI);
         client.setAge(30);
         client.setPhoneNumber("0712121212");
 
         List<Interest> interests = new ArrayList<>();
         Interest interest = new Interest();
         interest.setId(UUID.randomUUID());
-        interest.setInterestType(InterestType.ELECTRONICE_IT);
+        interest.setInterestType(InterestType.ELECTRONICS_IT);
         interests.add(interest);
         client.setInterests(interests);
 
@@ -157,7 +157,7 @@ public class EndToEndIntegrationTest {
         seller.setEmail("e2e@seller.com");
         seller.setImageName("https://example.com/logo.png");
         seller.setDescription("E2E seller");
-        seller.setRegion(Region.TIMISOARA);
+        seller.setCounty(County.TIMIS);
 
         sellerRepository.save(seller);
 
@@ -212,7 +212,7 @@ public class EndToEndIntegrationTest {
             client.setFirstName("Client" + i);
             client.setLastName("Last" + i);
             client.setEmail("client" + i + "@example.com");
-            client.setRegion(Region.BUCURESTI);
+            client.setCounty(County.BUCURESTI);
             client.setAge(25 + i);
             client.setPhoneNumber("071" + (2000000 + i));
 
@@ -230,7 +230,7 @@ public class EndToEndIntegrationTest {
             seller.setEmail("seller" + i + "@example.com");
             seller.setImageName("https://example.com/logo" + i + ".png");
             seller.setDescription("Seller " + i);
-            seller.setRegion(Region.TIMISOARA);
+            seller.setCounty(County.TIMIS);
 
             sellerRepository.save(seller);
         }
@@ -263,7 +263,7 @@ public class EndToEndIntegrationTest {
         client.setFirstName("Concurrent");
         client.setLastName("Client");
         client.setEmail("concurrent@example.com");
-        client.setRegion(Region.BUCURESTI);
+        client.setCounty(County.BUCURESTI);
         client.setAge(25);
         client.setPhoneNumber("0712345678");
 
@@ -294,7 +294,7 @@ public class EndToEndIntegrationTest {
         client.setFirstName("Interest");
         client.setLastName("Client");
         client.setEmail("interests@example.com");
-        client.setRegion(Region.BUCURESTI);
+        client.setCounty(County.BUCURESTI);
         client.setAge(25);
         client.setPhoneNumber("0712345678");
 
@@ -317,33 +317,33 @@ public class EndToEndIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "regionchange", roles = {"CLIENT"})
-    public void testRegionChange() throws Exception {
+    @WithMockUser(username = "Countychange", roles = {"CLIENT"})
+    public void testCountyChange() throws Exception {
         UUID clientId = UUID.randomUUID();
         Client client = new Client();
         client.setId(clientId);
-        client.setUsername("regionchange");
-        client.setFirstName("Region");
+        client.setUsername("Countychange");
+        client.setFirstName("County");
         client.setLastName("Client");
-        client.setEmail("region@example.com");
-        client.setRegion(Region.BUCURESTI);
+        client.setEmail("County@example.com");
+        client.setCounty(County.BUCURESTI);
         client.setAge(25);
         client.setPhoneNumber("0712345678");
 
         clientRepository.save(client);
 
-        Region[] regions = {Region.CLUJ, Region.TIMISOARA, Region.CONSTANTA};
+        County[] counties = {County.CLUJ, County.TIMIS, County.CONSTANTA};
 
-        for (Region region : regions) {
+        for (County county : counties) {
             ClientDTO updateDTO = new ClientDTO();
-            updateDTO.setRegion(region);
+            updateDTO.setCounty(county);
 
             mockMvc.perform(put("/v1/users/client/profile")
                             .header(USER_ID_HEADER, clientId.toString())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(updateDTO)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.region", is(region.toString())));
+                    .andExpect(jsonPath("$.county", is(county.toString())));
         }
     }
 
@@ -357,7 +357,7 @@ public class EndToEndIntegrationTest {
         seller.setEmail("delete@seller.com");
         seller.setImageName("https://example.com/logo.png");
         seller.setDescription("To be deleted");
-        seller.setRegion(Region.BUCURESTI);
+        seller.setCounty(County.BUCURESTI);
 
         sellerRepository.save(seller);
         assertTrue(sellerRepository.existsById(sellerId));
@@ -395,7 +395,7 @@ public class EndToEndIntegrationTest {
             client.setFirstName("Client" + i);
             client.setLastName("Last" + i);
             client.setEmail("client" + i + "@example.com");
-            client.setRegion(Region.BUCURESTI);
+            client.setCounty(County.BUCURESTI);
             client.setAge(25 + i);
             client.setPhoneNumber("071" + (2000000 + i));
 
@@ -426,7 +426,7 @@ public class EndToEndIntegrationTest {
         client.setFirstName("Message");
         client.setLastName("Content");
         client.setEmail("message@example.com");
-        client.setRegion(Region.BUCURESTI);
+        client.setCounty(County.BUCURESTI);
         client.setAge(25);
         client.setPhoneNumber("0712345678");
 

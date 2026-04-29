@@ -76,6 +76,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Binding addSellerBinding() {
+        System.out.println(userTopicExchange + "." + uniqueQueueName + "." + addSellerRoutingKey);
         return BindingBuilder.bind(addSellerQueue())
                 .to(userTopicExchange())
                 .with(addSellerRoutingKey);

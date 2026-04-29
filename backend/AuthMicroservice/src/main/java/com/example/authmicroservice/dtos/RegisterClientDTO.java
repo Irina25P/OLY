@@ -31,8 +31,15 @@ public class RegisterClientDTO {
     @NotBlank(message = "Password is required")
     private String password;
 
-    private String region;
+    @NotBlank(message = "County is required")
+    private String county;
+
+    @NotNull(message = "Age is required")
     private Integer age;
+
+    @NotBlank(message = "Phone number is required")
     private String phoneNumber;
+
+    @NotNull(message = "Interests are required")
     private List<String> interests;
 }

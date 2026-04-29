@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.usermicroservice.entities.InterestType;
-import org.example.usermicroservice.entities.Region;
+import org.example.usermicroservice.entities.County;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +18,7 @@ public class ClientDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private Region region;
+    private County county;
     private Integer age;
     private String phoneNumber;
     private List<InterestType> interests;

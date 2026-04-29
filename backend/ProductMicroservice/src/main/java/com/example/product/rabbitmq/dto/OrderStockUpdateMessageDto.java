@@ -12,6 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderStockUpdateMessageDto {
-    private UUID productId;
+    private UUID id;
     private Integer stock;
 }

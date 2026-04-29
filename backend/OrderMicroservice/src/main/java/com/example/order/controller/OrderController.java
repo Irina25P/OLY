@@ -49,7 +49,8 @@ public class OrderController {
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public String save(@Valid @RequestBody OrderFullDto request) {
+    public String save(@Valid @RequestBody OrderFullDto request, @RequestHeader(name = "${security.user-id-header}") String userId) {
+        request.getOrder().setClientId(UUID.fromString(userId));
         return orderService.save(request.getOrder(), request.getOrderProducts());
     }
 

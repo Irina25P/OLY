@@ -8,12 +8,10 @@ import com.example.order.dto.mapper.ProductMessageMapper;
 import com.example.order.entities.Order;
 import com.example.order.entities.Product;
 import com.example.order.entities.User;
-import com.example.order.entities.enums.OrderStatus;
 import com.example.order.repository.OrderRepository;
 import com.example.order.repository.OrderProductsRepository;
 import com.example.order.repository.ProductRepository;
 import com.example.order.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -95,9 +93,21 @@ public class OrderService {
 
     @Transactional
     public String save(OrderDto orderDto, List<OrderProductDto> orderProducts) {
+        // Step 1: Validate users exist
+        LOGGER.info(orderDto.toString());
+        User client = userRepository.findById(orderDto.getClientId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Client with id " + orderDto.getClientId() + " not found"));
+
+        User seller = userRepository.findById(orderDto.getSellerId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Seller with id " + orderDto.getSellerId() + " not found"));
+
+        // Step 2: Validate products exist and check stock
         validateStock(orderProducts);
 
-        Order order = orderRepository.save(OrderMapper.toOrder(orderDto));
+        // Step 3: Map with validated user instances and save
+        Order order = orderRepository.save(OrderMapper.toOrder(orderDto, client, seller));
         orderProducts.forEach(orderProductDto -> {
             orderProductDto.setOrderId(order.getId());
             orderProductsRepository.save(OrderProductsMapper.toOrderProducts(orderProductDto));
@@ -160,8 +170,12 @@ public class OrderService {
     }
 
     public OrderFullDto findFullOrderById(UUID orderId, UUID userId) {
-        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        // Verify user exists
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 
         UUID clientId = order.getClient() != null ? order.getClient().getId() : null;
         UUID sellerId = order.getSeller() != null ? order.getSeller().getId() : null;
@@ -186,12 +200,18 @@ public class OrderService {
     }
 
     public String updateOrderStatus(OrderStatusUpdateDto orderDto, UUID userId) {
-        Order order =  orderRepository.findById(orderDto.getId()).orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        Order order = orderRepository.findById(orderDto.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (!order.getSeller().getId().equals(user.getId())) {
             throw new AccessDeniedException("You are not allowed to access this order");
         }
+
+        // Update the order status
+        order.setStatusType(orderDto.getStatus());
+        orderRepository.save(order);
 
         try{
             String message = objectMapper.writeValueAsString(OrderNotificationMapper.toOrderNotificationDto(OrderMapper.toOrderDto(order)));

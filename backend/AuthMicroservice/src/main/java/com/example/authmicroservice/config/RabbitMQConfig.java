@@ -8,11 +8,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${rabbitmq.sync.exchange.addUser.topic}")
-    private String addUserTopicExchange;
-
-    @Value("${rabbitmq.sync.exchange.deleteUser.topic}")
-    private String deleteUserTopicExchange;
+    @Value("${rabbitmq.sync.exchange.user.topic}")
+    private String userTopicExchange;
 
     @Value("${rabbitmq.sync.queue.unique.name}")
     private String uniqueQueueName;
@@ -21,23 +18,18 @@ public class RabbitMQConfig {
     private String deleteUserRoutingKey;
 
     @Bean
-    public TopicExchange addUserTopicExchange() {
-        return new TopicExchange(addUserTopicExchange, true, false);
-    }
-
-    @Bean
-    public TopicExchange deleteUserTopicExchange() {
-        return new TopicExchange(deleteUserTopicExchange, true, false);
+    public TopicExchange userTopicExchange() {
+        return new TopicExchange(userTopicExchange, true, false);
     }
 
     @Bean
     public Queue deleteUserQueue() {
-        return new Queue(deleteUserTopicExchange + "." + uniqueQueueName + "." + deleteUserRoutingKey, true, false, false);
+        return new Queue(userTopicExchange + "." + uniqueQueueName + "." + deleteUserRoutingKey, true, false, false);
     }
 
     @Bean
     public Binding deleteUserBinding() {
-        return BindingBuilder.bind(deleteUserQueue()).to(deleteUserTopicExchange()).with(deleteUserRoutingKey);
+        return BindingBuilder.bind(deleteUserQueue()).to(userTopicExchange()).with(deleteUserRoutingKey);
     }
 }
 

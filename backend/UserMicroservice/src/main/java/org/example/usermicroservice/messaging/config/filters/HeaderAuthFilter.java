@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,14 +17,20 @@ import java.util.List;
 
 public class HeaderAuthFilter extends OncePerRequestFilter {
 
+    @Value("${security.user-id-header}")
+    private String userIdHeader;
+
+    @Value("${security.role-header}")
+    private String roleHeader;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String username = request.getHeader("${security.username-header}");
-        String role = request.getHeader("${security.role-header}");
+        String username = request.getHeader(userIdHeader);
+        String role = request.getHeader(roleHeader);
 
         String path = request.getRequestURI();
         if (path.startsWith("/v3/api-docs") ||

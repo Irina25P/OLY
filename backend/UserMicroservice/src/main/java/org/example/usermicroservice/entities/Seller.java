@@ -21,6 +21,9 @@ public class Seller implements Serializable {
     private UUID id;
 
     @Column(nullable = false, unique = true)
+    private String name;
+
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
@@ -34,5 +37,5 @@ public class Seller implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Region region;
+    private County county;
 }

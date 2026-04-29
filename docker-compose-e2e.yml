@@ -1,0 +1,330 @@
+version: "3.9"
+
+services:
+  # --- INFRASTRUCTURE ---
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./dynamic:/etc/traefik/dynamic:ro"
+      - "./logs:/var/log/traefik"
+    networks:
+      - oly_net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - oly_net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      retries: 10
+
+  # --- DATABASES ---
+  # One Postgres instance can hold all your databases (db_auth, db_users, etc.)
+  postgres:
+    image: postgres
+    container_name: OLY-database
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - oly_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d db_auth"]
+      interval: 5s
+      retries: 5
+
+  # --- STORAGE ---
+  minio:
+    image: minio/minio
+    container_name: minio-server
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: parolasupersecreta123
+    volumes:
+      - minio_data:/data
+    networks:
+      - oly_net
+    command: server /data --console-address ":9001"
+
+  minio-setup:
+    image: minio/mc
+    depends_on:
+      - minio
+    networks:
+      - oly_net
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc alias set myminio http://minio:9000 admin parolasupersecreta123) do echo 'Waiting for MinIO...' && sleep 1; done;
+      /usr/bin/mc mb myminio/disi-images;
+      /usr/bin/mc anonymous set public myminio/disi-images;
+      exit 0;
+      "
+
+  # --- YOUR SERVICES (Excluding Frontend) ---
+  auth-service:
+    build: ./backend/AuthMicroservice
+    container_name: auth-service
+    ports:
+      - "8081:8080"
+    environment:
+      DB_IP: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_DBNAME: db_auth
+      PORT: 8080
+      JWT_SECRET_TOKEN: O4/hhlvFjaIftjZ7R1/pfbN+FT6A0cp5rfRm8pZHKbU=
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ADMIN: addUser.admin
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_UNIQUE_NAME: auth-service
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      postgres: { condition: service_started }
+    networks:
+      - oly_net
+
+  user-service:
+    build:
+      context: ./backend/UserMicroservice
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: always
+    ports:
+      - "8082:8080"
+    environment:
+      DB_IP: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_DBNAME: db_users
+      PORT: 8080
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_DELETEIMAGE_TOPIC: deleteImage-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ADMIN: addUser.admin
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEIMAGE: deleteImage
+      RABBITMQ_SYNC_UNIQUE_NAME: user-service
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      postgres: { condition: service_started }
+    networks:
+      - oly_net
+
+  product-service:
+    build:
+      context: ./backend/ProductMicroservice
+      dockerfile: Dockerfile
+    container_name: product-service
+    restart: always
+    ports:
+      - "8083:8080"
+    environment:
+      DB_IP: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_DBNAME: db_products
+      PORT: 8080
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_CHANGESTOCK_TOPIC: changeStock-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_PRODUCT_TOPIC: product-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_DELETEIMAGE_TOPIC: deleteImage-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_NOTIFICATION_TOPIC: notification-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_ROUTINGKEY_CHANGESTOCK: changeStock
+      RABBITMQ_SYNC_ROUTINGKEY_ADDPRODUCT: addProduct
+      RABBITMQ_SYNC_ROUTINGKEY_UPDATEPRODUCT: updateProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEPRODUCT: deleteProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEIMAGE: deleteImage
+      RABBITMQ_SYNC_UNIQUE_NAME: product-service
+      RABBITMQ_SYNC_ROUTINGKEY_REVIEW_CREATED: reviewCreated
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      postgres: { condition: service_started }
+    networks:
+      - oly_net
+
+  order-service:
+    build:
+      context: ./backend/OrderMicroservice
+      dockerfile: Dockerfile
+    container_name: order-service
+    restart: always
+    ports:
+      - "8084:8080"
+    environment:
+      DB_IP: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_DBNAME: db_orders
+      PORT: 8080
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_CHANGESTOCK_TOPIC: changeStock-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_PRODUCT_TOPIC: product-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_NOTIFICATION_TOPIC: notification-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_ROUTINGKEY_CHANGESTOCK: changeStock
+      RABBITMQ_SYNC_ROUTINGKEY_ADDPRODUCT: addProduct
+      RABBITMQ_SYNC_ROUTINGKEY_UPDATEPRODUCT: updateProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEPRODUCT: deleteProduct
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_CREATED: orderCreated
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_UPDATED: orderUpdated
+      RABBITMQ_SYNC_UNIQUE_NAME: order-service
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      postgres: { condition: service_started }
+    networks:
+      - oly_net
+
+  image-management-service:
+    build:
+      context: ./backend/ImageManagementMicroservice
+      dockerfile: Dockerfile
+    container_name: image-management-service
+    restart: always
+    ports:
+      - "8090:8080"
+    environment:
+      PORT: 8080
+      MINIO_IP: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: parolasupersecreta123
+      MINIO_BUCKET_NAME: disi-images
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_DELETEIMAGE_TOPIC: deleteImage-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEIMAGE: deleteImage
+      RABBITMQ_SYNC_UNIQUE_NAME: image-management-service
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      postgres: { condition: service_started }
+    networks:
+      - oly_net
+    
+  notification-service:
+    build:
+      context: ./backend/NotificationMicroservice
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: always
+    ports:
+      - "8086:8080"
+    environment:
+      DB_IP: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_DBNAME: db_notifications
+      PORT: 8080
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_NOTIFICATION_TOPIC: notification-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_CREATED: orderCreated
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_UPDATED: orderUpdated
+      RABBITMQ_SYNC_ROUTINGKEY_REVIEW_CREATED: reviewCreated
+      RABBITMQ_SYNC_UNIQUE_NAME: notification-service
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      minio: { condition: service_started }
+    networks:
+      - oly_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - "3000:80"
+    environment:
+      BACKEND: traefik
+    networks:
+      - oly_net
+
+  e2e-tests:
+    build: 
+      context: ./E2ETests
+      dockerfile: Dockerfile
+    container_name: e2e-runner
+    networks:
+      - oly_net
+    
+    depends_on:
+      auth-service: { condition: service_started }
+      user-service: { condition: service_started }
+      product-service: { condition: service_started }
+      order-service: { condition: service_started }
+      image-management-service: { condition: service_started }
+      minio-setup: { condition: service_completed_successfully }
+    command: >
+      sh -c "echo 'Infrastructure loaded. Waiting 5 seconds for final stabilization...' && 
+             sleep 5 && 
+             echo 'Starting Maven tests...' &&
+             mvn test"
+
+volumes:
+  rabbitmq_data:
+  pgdata:
+  minio_data:
+
+networks:
+  oly_net:
+    driver: bridge

@@ -8,16 +8,13 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
-    command:
-      - "--api.insecure=true"
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./dynamic:/etc/traefik/dynamic:ro"
+      - "./logs:/var/log/traefik"
     networks:
-      - my_net
+      - oly_net
 
 
   rabbitmq:
@@ -27,10 +24,32 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq-data:/var/lib/rabbitmq
     networks:
-      - my_net
+      - oly_net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - "3000:80"
+    environment:
+      BACKEND: traefik
+      IMAGE_IP: 92.5.49.167
+      IMAGE_CONTAINER_NAME: disi-images
+    networks:
+      - oly_net
 
   auth-service:
     build:
@@ -38,27 +57,32 @@ services:
       dockerfile: Dockerfile
     container_name: auth-service
     restart: always
+    ports:
+      - "8081:8080"
     environment:
       DB_IP: 92.5.49.167
       DB_PORT: 5432
-      DB_DBNAME: db_auth
       DB_USER: admin
       DB_PASSWORD: admin
+      DB_DBNAME: db_auth
       PORT: 8080
-      TZ: UTC
+      JWT_SECRET_TOKEN: O4/hhlvFjaIftjZ7R1/pfbN+FT6A0cp5rfRm8pZHKbU=
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ADMIN: addUser.admin
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_UNIQUE_NAME: auth-service
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - my_net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.auth-router.rule=PathPrefix(`/api/v1/auth`)"
-      - "traefik.http.routers.auth-router.entrypoints=web"
-      - "traefik.http.middlewares.auth-strip.stripprefix.prefixes=/api"
-      - "traefik.http.routers.auth-router.middlewares=auth-strip"
-      - "traefik.http.services.auth-service.loadbalancer.server.port=8080"
+      - oly_net
 
   user-service:
     build:
@@ -66,27 +90,33 @@ services:
       dockerfile: Dockerfile
     container_name: user-service
     restart: always
+    ports:
+      - "8082:8080"
     environment:
       DB_IP: 92.5.49.167
       DB_PORT: 5432
-      DB_DBNAME: db_users
       DB_USER: admin
       DB_PASSWORD: admin
+      DB_DBNAME: db_users
       PORT: 8080
-      TZ: UTC
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_DELETEIMAGE_TOPIC: deleteImage-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ADMIN: addUser.admin
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEIMAGE: deleteImage
+      RABBITMQ_SYNC_UNIQUE_NAME: user-service
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - my_net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.user-router.rule=PathPrefix(`/api/v1/users`)"
-      - "traefik.http.routers.user-router.entrypoints=web"
-      - "traefik.http.middlewares.user-strip.stripprefix.prefixes=/api"
-      - "traefik.http.routers.user-router.middlewares=user-strip"
-      - "traefik.http.services.user-service.loadbalancer.server.port=8080"
+      - oly_net
 
   product-service:
     build:
@@ -94,23 +124,40 @@ services:
       dockerfile: Dockerfile
     container_name: product-service
     restart: always
+    ports:
+      - "8083:8080"
     environment:
       DB_IP: 92.5.49.167
       DB_PORT: 5432
-      DB_DBNAME: db_products
       DB_USER: admin
       DB_PASSWORD: admin
+      DB_DBNAME: db_products
       PORT: 8080
-      TZ: UTC
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_CHANGESTOCK_TOPIC: changeStock-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_PRODUCT_TOPIC: product-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_DELETEIMAGE_TOPIC: deleteImage-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_NOTIFICATION_TOPIC: notification-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_ROUTINGKEY_CHANGESTOCK: changeStock
+      RABBITMQ_SYNC_ROUTINGKEY_ADDPRODUCT: addProduct
+      RABBITMQ_SYNC_ROUTINGKEY_UPDATEPRODUCT: updateProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEPRODUCT: deleteProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEIMAGE: deleteImage
+      RABBITMQ_SYNC_UNIQUE_NAME: product-service
+      RABBITMQ_SYNC_ROUTINGKEY_REVIEW_CREATED: reviewCreated
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - my_net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.product-router.rule=PathPrefix(`/api/v1/products`)"
-      - "traefik.http.routers.product-router.entrypoints=web"
-      - "traefik.http.middlewares.product-strip.stripprefix.prefixes=/api"
-      - "traefik.http.routers.product-router.middlewares=product-strip"
-      - "traefik.http.services.product-service.loadbalancer.server.port=8080"
+      - oly_net
 
   order-service:
     build:
@@ -118,52 +165,67 @@ services:
       dockerfile: Dockerfile
     container_name: order-service
     restart: always
+    ports:
+      - "8084:8080"
     environment:
       DB_IP: 92.5.49.167
       DB_PORT: 5432
-      DB_DBNAME: db_orders
       DB_USER: admin
       DB_PASSWORD: admin
+      DB_DBNAME: db_orders
       PORT: 8080
-      TZ: UTC
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_USER_TOPIC: user-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_CHANGESTOCK_TOPIC: changeStock-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_PRODUCT_TOPIC: product-Topic-Exchange
+      RABBITMQ_SYNC_EXCHANGE_NOTIFICATION_TOPIC: notification-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_CLIENT: addUser.client
+      RABBITMQ_SYNC_ROUTINGKEY_SELLER: addUser.seller
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEUSER: deleteUser
+      RABBITMQ_SYNC_ROUTINGKEY_CHANGESTOCK: changeStock
+      RABBITMQ_SYNC_ROUTINGKEY_ADDPRODUCT: addProduct
+      RABBITMQ_SYNC_ROUTINGKEY_UPDATEPRODUCT: updateProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEPRODUCT: deleteProduct
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_CREATED: orderCreated
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_UPDATED: orderUpdated
+      RABBITMQ_SYNC_UNIQUE_NAME: order-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - my_net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.order-router.rule=PathPrefix(`/api/v1/orders`)"
-      - "traefik.http.routers.order-router.entrypoints=web"
-      - "traefik.http.middlewares.order-strip.stripprefix.prefixes=/api"
-      - "traefik.http.routers.order-router.middlewares=order-strip"
-      - "traefik.http.services.order-service.loadbalancer.server.port=8080"
+      - oly_net
 
-  image-service:
+  image-management-service:
     build:
       context: ./backend/ImageManagementMicroservice
       dockerfile: Dockerfile
-    container_name: image-service
+    container_name: image-management-service
     restart: always
+    ports:
+      - "8085:8080"
     environment:
-      DB_IP: 92.5.49.167
-      DB_PORT: 5432
-      DB_DBNAME: db_images
-      DB_USER: admin
-      DB_PASSWORD: admin
-      PORT: 8080
-      TZ: UTC
-      MINIO_URL: http://minio:9000
+      MINIO_IP: 92.5.49.167
+      MINIO_PORT: 9000
       MINIO_ACCESS_KEY: admin
-      MINIO_SECRET_KEY: adminadmin
+      MINIO_SECRET_KEY: parolasupersecreta123
+      MINIO_BUCKET_NAME: disi-images
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_DELETEIMAGE_TOPIC: deleteImage-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEIMAGE: deleteImage
+      RABBITMQ_SYNC_UNIQUE_NAME: image-management-service
     depends_on:
-      - minio
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - my_net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.image-router.rule=PathPrefix(`/api/v1/images`)"
-      - "traefik.http.routers.image-router.entrypoints=web"
-      - "traefik.http.middlewares.image-strip.stripprefix.prefixes=/api"
-      - "traefik.http.routers.image-router.middlewares=image-strip"
-      - "traefik.http.services.image-service.loadbalancer.server.port=8080"
+      - oly_net
     
   notification-service:
     build:
@@ -171,23 +233,27 @@ services:
       dockerfile: Dockerfile
     container_name: notification-service
     restart: always
+    ports:
+      - "8086:8080"
     environment:
       DB_IP: 92.5.49.167
       DB_PORT: 5432
-      DB_DBNAME: db_notifications
       DB_USER: admin
       DB_PASSWORD: admin
+      DB_DBNAME: db_notifications
       PORT: 8080
-      TZ: UTC
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_NOTIFICATION_TOPIC: notification-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_CREATED: orderCreated
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_UPDATED: orderUpdated
+      RABBITMQ_SYNC_ROUTINGKEY_REVIEW_CREATED: reviewCreated
+      RABBITMQ_SYNC_UNIQUE_NAME: notification-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - my_net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.notification-router.rule=PathPrefix(`/api/v1/notification`)"
-      - "traefik.http.routers.notification-router.entrypoints=web"
-      - "traefik.http.middlewares.notification-strip.stripprefix.prefixes=/api"
-      - "traefik.http.routers.notification-router.middlewares=notification-strip"
-      - "traefik.http.services.notification-service.loadbalancer.server.port=8080"
+      - oly_net
 
   frontend:
     build:
@@ -202,17 +268,11 @@ services:
       - order-service
       - image-service
     networks:
-      - my_net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - oly_net
 
 volumes:
   rabbitmq_data:
-  minio_data:
 
 networks:
-  my_net:
+  oly_net:
     driver: bridge

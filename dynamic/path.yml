@@ -1,0 +1,139 @@
+http:
+  routers:
+    cors-preflight-router:
+      rule: "Method(`OPTIONS`)"
+      entryPoints:
+        - web
+      service: noop@internal
+      priority: 100
+      middlewares:
+        - cors-headers
+
+    frontend:
+      rule: "(Host(`localhost`) || Host(`traefik`))"
+      entryPoints:
+        - web
+      service: frontend
+
+    users-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/users`)" 
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - jwt-auth-forwarder
+        - strip-api-prefix
+      service: user-service
+    
+    image-management-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/images`)"
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - strip-api-prefix
+      service: image-management-service
+
+    products-public-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/products/search`)"
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - strip-api-prefix
+      service: product-service
+      priority: 99
+
+    products-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && (PathPrefix(`/api/v1/products`) || PathPrefix(`/api/v1/reviews`) || PathPrefix(`/api/v1/seller-replies`))"
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - jwt-auth-forwarder
+        - strip-api-prefix
+      priority: 90
+      service: product-service
+
+    orders-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/orders`)"
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - jwt-auth-forwarder
+        - strip-api-prefix
+      service: order-service
+
+    auth-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/auth`)"
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - strip-api-prefix
+      service: auth-service
+
+    
+
+  middlewares:
+    strip-api-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
+
+    cors-headers:
+      headers:
+        accessControlAllowOriginList:
+          - "http://localhost:3000"
+          - "http://localhost"
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "OPTIONS"
+        accessControlAllowHeaders:
+          - "Authorization"
+          - "Content-Type"
+        accessControlAllowCredentials: true
+
+    jwt-auth-forwarder:
+      forwardAuth:
+        address: "http://auth-service:8080/v1/auth/verify"
+        
+        authResponseHeaders:
+          - "Username-Header"
+          - "Role-Header"
+          - "UserId-Header"
+
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:80"
+
+    user-service:
+      loadBalancer:
+        servers:
+          - url: "http://user-service:8080" 
+
+    image-management-service:
+      loadBalancer:
+        servers:
+          - url: "http://image-management-service:8080" 
+
+    product-service:
+      loadBalancer:
+        servers:
+          - url: "http://product-service:8080" 
+
+    order-service:
+      loadBalancer:
+        servers:
+          - url: "http://order-service:8080" 
+
+    auth-service:
+      loadBalancer:
+        servers:
+          - url: "http://auth-service:8080"

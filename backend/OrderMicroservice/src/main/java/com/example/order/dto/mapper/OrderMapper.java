@@ -31,6 +31,19 @@ public class OrderMapper {
         );
     }
 
+    public static Order toOrder(OrderDto orderDto, User client, User seller) {
+        return new Order(
+                orderDto.getId(),
+                client,
+                seller,
+                orderDto.getStatusType(),
+                orderDto.getPayment(),
+                orderDto.getCounty(),
+                orderDto.getCity(),
+                orderDto.getStreet()
+        );
+    }
+
     public static OrderDto toOrderDto(Order order) {
         OrderDto dto = new OrderDto(
                 order.getClient() != null ? order.getClient().getId() : null,

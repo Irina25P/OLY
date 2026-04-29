@@ -1,10 +1,11 @@
 package org.example.usermicroservice.entities;
 
 public enum InterestType {
-    ELECTRONICE_IT,
-    MODA_ACCESORII,
-    CASA_GRADINA,
+    ELECTRONICS_IT,
+    FASHION_ACCESSORIES,
+    HOME_GARDEN,
     AUTO_MOTO,
-    SPORT_OUTDOOR,
-    JOCURI_GAMING
+    SPORTS_OUTDOOR,
+    GAMES_GAMING
 }
+

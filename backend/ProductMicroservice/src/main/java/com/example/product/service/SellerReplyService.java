@@ -10,11 +10,13 @@ import com.example.product.exception.SellerReplyException;
 import com.example.product.repository.ReviewRepository;
 import com.example.product.repository.SellerReplyRepository;
 import com.example.product.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -53,10 +55,19 @@ public class SellerReplyService {
                 .build();
     }
 
+    @Transactional
     public void deleteReply(UUID replyId, UUID userId) {
         SellerReply reply = sellerReplyRepository.findById(replyId)
                 .orElseThrow(() -> new SellerReplyException("Reply not found with id: " + replyId));
+
+        Review review = reviewRepository.findBySellerReply(reply)
+                .orElseThrow(() -> new SellerReplyException("Review not found for this reply"));
+
+        review.setSellerReply(null);
+        reviewRepository.save(review);
+
         if (!reply.getUser().getId().equals(userId)) {
+            System.out.println("S-a ajung aici !!!!!!");
             throw new SellerReplyException("User is not authorized to delete this reply");
         }
         sellerReplyRepository.deleteById(replyId);
