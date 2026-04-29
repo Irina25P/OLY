@@ -15,7 +15,7 @@ public class ClientMessageMapper {
                 dto.getLastName(),
                 dto.getEmail(),
                 dto.getUsername(),
-                dto.getRegion(),
+                dto.getCounty(),
                 dto.getAge(),
                 dto.getPhoneNumber(),
                 dto.getInterests()

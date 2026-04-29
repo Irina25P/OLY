@@ -10,5 +10,7 @@ import java.util.UUID;
 @Repository
 public interface OrderProductsRepository extends JpaRepository<OrderProducts, UUID> {
 	List<OrderProducts> findAllByOrder_Id(UUID orderId);
+
+	void deleteByProduct_Id(UUID productId);
 }
 

@@ -19,7 +19,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<List<ProductResponseDto>> getAllProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) List<InterestType> categories,

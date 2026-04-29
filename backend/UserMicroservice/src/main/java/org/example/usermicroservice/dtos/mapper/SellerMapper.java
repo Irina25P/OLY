@@ -12,7 +12,8 @@ public class SellerMapper {
         dto.setEmail(seller.getEmail());
         dto.setImageName(seller.getImageName());
         dto.setDescription(seller.getDescription());
-        dto.setRegion(seller.getRegion());
+        dto.setCounty(seller.getCounty());
+        dto.setName(seller.getName());
         return dto;
     }
 
@@ -23,7 +24,8 @@ public class SellerMapper {
         seller.setEmail(dto.getEmail());
         seller.setImageName(dto.getImageName());
         seller.setDescription(dto.getDescription());
-        seller.setRegion(dto.getRegion());
+        seller.setCounty(dto.getCounty());
+        seller.setName(dto.getName());
         return seller;
     }
 
@@ -37,8 +39,12 @@ public class SellerMapper {
         if (dto.getDescription() != null) {
             seller.setDescription(dto.getDescription());
         }
-        if (dto.getRegion() != null) {
-            seller.setRegion(dto.getRegion());
+        if (dto.getCounty() != null) {
+            seller.setCounty(dto.getCounty());
+        }
+
+        if (dto.getName() != null) {
+            seller.setName(dto.getName());
         }
     }
 }

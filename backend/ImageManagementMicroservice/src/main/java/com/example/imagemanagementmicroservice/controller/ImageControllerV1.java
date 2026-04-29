@@ -6,19 +6,18 @@ import com.example.imagemanagementmicroservice.service.MinIOService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/v1/images")
+@CrossOrigin
 public class ImageControllerV1 {
 
     @Autowired
     private MinIOService minIOService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('CLIENT') or hasRole('SELLER')")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             if (file.isEmpty()) {
@@ -59,7 +58,6 @@ public class ImageControllerV1 {
     }
 
     @DeleteMapping()
-    @PreAuthorize("hasRole('CLIENT') or hasRole('SELLER')")
     public ResponseEntity<?> deleteImage(@RequestParam("objectName") String objectName) {
         try {
             minIOService.deleteImage(objectName);

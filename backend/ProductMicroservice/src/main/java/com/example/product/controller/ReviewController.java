@@ -29,7 +29,7 @@ public class ReviewController {
     }
 
     @GetMapping("/product/{productId}")
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasRole('CLIENT') or hasRole('SELLER')")
     public ResponseEntity<List<ReviewDetailDTO>> getReviewsByProduct(@PathVariable UUID productId) {
         List<ReviewDetailDTO> reviews = reviewService.getReviewsByProductId(productId);
         return ResponseEntity.ok(reviews);

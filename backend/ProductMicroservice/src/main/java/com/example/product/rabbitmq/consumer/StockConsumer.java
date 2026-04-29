@@ -22,7 +22,7 @@ public class StockConsumer {
     @RabbitListener(queues = "${rabbitmq.sync.exchange.changeStock.topic}.${rabbitmq.sync.queue.unique.name}.${rabbitmq.sync.routingKey.changeStock}")
     public void receiveStockUpdate(String message) {
         try {
-            OrderStockUpdateMessageDto receivedMessage = objectMapper.convertValue(message, OrderStockUpdateMessageDto.class);
+            OrderStockUpdateMessageDto receivedMessage = objectMapper.readValue(message, OrderStockUpdateMessageDto.class);
             productService.updateStockFromOrder(receivedMessage);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

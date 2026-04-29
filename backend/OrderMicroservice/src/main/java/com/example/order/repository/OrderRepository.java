@@ -11,4 +11,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID>{
     List<Order> findOrdersByClient(User user);
 
     List<Order> findOrdersBySeller(User user);
+
+    void deleteByClient_Id(UUID clientId);
+
+    void deleteBySeller_Id(UUID sellerId);
 }

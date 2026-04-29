@@ -27,13 +27,13 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue deleteImagesQueue() {
-        return new Queue(deleteImagesExchangeName + "." + uniqueQueueName, true, false, false);
+        return new Queue(deleteImagesExchangeName + "." + uniqueQueueName + "." + deleteImagesRoutingKey, true, false, false);
     }
 
     @Bean
-    public Binding deleteImagesBinding(Queue deleteImagesQueue, TopicExchange deleteImagesTopicExchange) {
-        return BindingBuilder.bind(deleteImagesQueue)
-                .to(deleteImagesTopicExchange)
+    public Binding deleteImagesBinding() {
+        return BindingBuilder.bind(deleteImagesQueue())
+                .to(deleteImagesTopicExchange())
                 .with(deleteImagesRoutingKey);
     }
 }

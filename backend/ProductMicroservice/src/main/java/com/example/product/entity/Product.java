@@ -33,7 +33,7 @@ public class Product {
     @Column(nullable=false, name = "stock")
     private Integer stock;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "entity_images", joinColumns = @JoinColumn(name = "entity_id"))
     @Column(name = "image_name")
     private List<String> imageNames = new ArrayList<>();

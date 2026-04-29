@@ -6,20 +6,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class DeleteImagesConsumer {
     private static final Logger log = LoggerFactory.getLogger(DeleteImagesConsumer.class);
 
     final private MinIOService minIOService;
+    final private ObjectMapper objectMapper;
 
-    public DeleteImagesConsumer(MinIOService minIOService) {
+    public DeleteImagesConsumer(MinIOService minIOService, ObjectMapper objectMapper) {
         this.minIOService = minIOService;
+        this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "${rabbitmq.sync.exchange.deleteImages.topic}.${rabbitmq.sync.queue.unique.name}")
-    public void handleImageDeletion(ImageDeletionRequest deletionRequest) {
+    @RabbitListener(queues = "${rabbitmq.sync.exchange.deleteImages.topic}.${rabbitmq.sync.queue.unique.name}.${rabbitmq.sync.exchange.deleteImages.routingkey}")
+    public void handleImageDeletion(String message) {
         try {
+            ImageDeletionRequest deletionRequest = objectMapper.readValue(message, ImageDeletionRequest.class);
             log.info("Received image deletion request with {} images",
                     deletionRequest.getImageNames().size()
             );

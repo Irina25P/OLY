@@ -40,7 +40,7 @@ public class Client implements Serializable {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private Region region;
+    private County county;
 
     @Column(nullable = false)
     private Integer age;

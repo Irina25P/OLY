@@ -40,8 +40,8 @@ public class UserService implements UserDetailsService {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${rabbitmq.sync.exchange.addUser.topic}")
-    private String syncExchangeAddUserTopic;
+    @Value("${rabbitmq.sync.exchange.user.topic}")
+    private String syncExchangeUserTopic;
 
     @Value("${rabbitmq.sync.routingkey.admin}")
     private String routingKeyAdmin;
@@ -86,7 +86,7 @@ public class UserService implements UserDetailsService {
 
         try {
             String message = objectMapper.writeValueAsString(adminMessageDTO);
-            rabbitTemplate.convertAndSend(syncExchangeAddUserTopic, routingKeyAdmin, message);
+            rabbitTemplate.convertAndSend(syncExchangeUserTopic, routingKeyAdmin, message);
             LOGGER.info("Sent admin sync message for user with id {}", user.getId());
         } catch (Exception e) {
             LOGGER.error("Error sending admin sync message to RabbitMQ: " + e.getMessage());
@@ -105,7 +105,7 @@ public class UserService implements UserDetailsService {
 
         try {
             String message = objectMapper.writeValueAsString(sellerMessageDTO);
-            rabbitTemplate.convertAndSend(syncExchangeAddUserTopic, routingKeySeller, message);
+            rabbitTemplate.convertAndSend(syncExchangeUserTopic, routingKeySeller, message);
             LOGGER.info("Sent seller sync message for user with id {}", user.getId());
         } catch (Exception e) {
             LOGGER.error("Error sending seller sync message to RabbitMQ: " + e.getMessage());
@@ -124,7 +124,7 @@ public class UserService implements UserDetailsService {
 
         try {
             String message = objectMapper.writeValueAsString(clientMessageDTO);
-            rabbitTemplate.convertAndSend(syncExchangeAddUserTopic, routingKeyClient, message);
+            rabbitTemplate.convertAndSend(syncExchangeUserTopic, routingKeyClient, message);
             LOGGER.info("Sent client sync message for user with id {}", user.getId());
         } catch (Exception e) {
             LOGGER.error("Error sending client sync message to RabbitMQ: " + e.getMessage());

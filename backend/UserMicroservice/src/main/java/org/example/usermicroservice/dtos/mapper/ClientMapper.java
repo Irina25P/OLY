@@ -18,7 +18,7 @@ public class ClientMapper {
         dto.setFirstName(client.getFirstName());
         dto.setLastName(client.getLastName());
         dto.setEmail(client.getEmail());
-        dto.setRegion(client.getRegion());
+        dto.setCounty(client.getCounty());
         dto.setAge(client.getAge());
         dto.setPhoneNumber(client.getPhoneNumber());
         if (client.getInterests() != null) {
@@ -36,7 +36,7 @@ public class ClientMapper {
         client.setFirstName(dto.getFirstName());
         client.setLastName(dto.getLastName());
         client.setEmail(dto.getEmail());
-        client.setRegion(dto.getRegion());
+        client.setCounty(dto.getCounty());
         client.setAge(dto.getAge());
         client.setPhoneNumber(dto.getPhoneNumber());
         if (dto.getInterests() != null) {
@@ -61,8 +61,8 @@ public class ClientMapper {
         if (dto.getEmail() != null) {
             client.setEmail(dto.getEmail());
         }
-        if (dto.getRegion() != null) {
-            client.setRegion(dto.getRegion());
+        if (dto.getCounty() != null) {
+            client.setCounty(dto.getCounty());
         }
         if (dto.getAge() != null) {
             client.setAge(dto.getAge());

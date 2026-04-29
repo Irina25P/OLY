@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4fee3299-9dc8-48fe-bfbe-4fab67df825d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/controller/OrderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/dto/OrderDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/dto/OrderDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/entities/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/entities/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/entities/OrderProducts.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/entities/OrderProducts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/entities/enums/County.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/entities/enums/County.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/java/com/example/order/service/OrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/OrderMicroservice/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/entity/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/entity/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/rabbitmq/consumer/StockConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/rabbitmq/consumer/StockConsumer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/rabbitmq/dto/ChangedStockMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/rabbitmq/dto/ChangedStockMessageDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/rabbitmq/dto/OrderStockUpdateMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/rabbitmq/dto/OrderStockUpdateMessageDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/repository/ReviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/repository/ReviewRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/service/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/service/ProductService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/service/SellerReplyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/ProductMicroservice/src/main/java/com/example/product/service/SellerReplyService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/UserMicroservice/src/main/java/org/example/usermicroservice/entities/County.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/UserMicroservice/src/main/java/org/example/usermicroservice/entities/County.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/UserMicroservice/src/main/java/org/example/usermicroservice/entities/InterestType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/UserMicroservice/src/main/java/org/example/usermicroservice/entities/InterestType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../backend/UserMicroservice/src/test/java/org/example/usermicroservice/EndToEndIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../backend/UserMicroservice/src/test/java/org/example/usermicroservice/EndToEndIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../docker-compose-e2e.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../docker-compose-e2e.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../dynamic/path.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../dynamic/path.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilotDiffState.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TEST_ORGANIZATION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/AddUserTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/BaseTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/OrderTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/ProductTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/ReviewTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/UserRegistrationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/constants/ApiEndpoints.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/constants/County.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/constants/InterestType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/constants/OrderStatus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/constants/PaymentMethod.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/AuthRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/AuthResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/ClientDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/OrderDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/OrderFullDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/OrderProductDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/OrderStatusUpdateDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/RegisterClientDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/RegisterSellerDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dtos/SellerDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/factories/UserFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/helpers/AuthHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/helpers/ImageHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/helpers/UserProfileHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/test_image.avif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../untitled/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../untitled/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../untitled/src/main/java/org/example/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../frontend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/../../../frontend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../frontend/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../../../frontend/nginx.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../frontend/src/pages/auth/RegisterPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../../frontend/src/pages/auth/RegisterPage.tsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/tosacezar/Projects/facultate/semestru 2/DISI/e2e_test/E2ETests/E2ETests" value="3Cwu7zdEeXVGmrMBkIdd4umpkLT" />
+    </persistenceIdMap>
+  </component>
+  <component name="CopilotUserSelectedChatMode">
+    <option name="chatModeId" value="Agent" />
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="chat-panel" value="Claude Haiku 4.5" />
+      <entry key="agent-panel" value="Claude Haiku 4.5" />
+    </selectedModels>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="3Cwu7zdEeXVGmrMBkIdd4umpkLT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.OrderTests.createOrderWrong.executor": "Run",
+    "JUnit.OrderTests.executor": "Run",
+    "JUnit.OrderTests.testClientViewOrders.executor": "Run",
+    "JUnit.OrderTests.testPlaceOrder.executor": "Run",
+    "JUnit.OrderTests.testSellerViewOrders.executor": "Run",
+    "JUnit.OrderTests.testUpdateOrderStatus.executor": "Run",
+    "JUnit.OrderTests.tooMuchStock.executor": "Run",
+    "JUnit.OrderTests.updateStock.executor": "Run",
+    "JUnit.ProductTests.executor": "Run",
+    "JUnit.ProductTests.queryProducts.executor": "Run",
+    "JUnit.ProductTests.testAnotherUserTryToDeleteProduct.executor": "Run",
+    "JUnit.ProductTests.testClientTryToCreateProduct.executor": "Run",
+    "JUnit.ProductTests.testCreateProduct.executor": "Run",
+    "JUnit.ProductTests.testDeleteProduct.executor": "Debug",
+    "JUnit.ProductTests.testListSellerProducts.executor": "Run",
+    "JUnit.ProductTests.testUpdateProduct.executor": "Debug",
+    "JUnit.ReviewTests.executor": "Run",
+    "JUnit.ReviewTests.testAddReview.executor": "Run",
+    "JUnit.ReviewTests.testAddSellerReply.executor": "Run",
+    "JUnit.ReviewTests.testCannotAddMultipleReviewsSameProduct.executor": "Run",
+    "JUnit.ReviewTests.testCannotReplyToOwnReview.executor": "Run",
+    "JUnit.ReviewTests.testDeleteClientRemovesReviews.executor": "Run",
+    "JUnit.ReviewTests.testDeleteProductRemovesReviews.executor": "Run",
+    "JUnit.ReviewTests.testDeleteReview.executor": "Run",
+    "JUnit.ReviewTests.testDeleteSellerReply.executor": "Run",
+    "JUnit.ReviewTests.testGetProductReviews.executor": "Run",
+    "JUnit.ReviewTests.testMultipleReviewsAffectAverageRating.executor": "Run",
+    "JUnit.UserRegistrationTests.executor": "Run",
+    "JUnit.UserRegistrationTests.testSellerRegistrationWithImageUploadFlow.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "BE/oly-69",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/tosacezar/Projects/facultate/semestru 2/DISI/e2e_test/E2ETests/E2ETests/src/test/java/dtos",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="dtos" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/test/java/dtos" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="dtos" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JUnit.ReviewTests">
+    <configuration name="ReviewTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="E2ETests" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="ReviewTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ReviewTests.testCannotAddMultipleReviewsSameProduct" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="E2ETests" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="ReviewTests" />
+      <option name="METHOD_NAME" value="testCannotAddMultipleReviewsSameProduct" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ReviewTests.testCannotReplyToOwnReview" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="E2ETests" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="ReviewTests" />
+      <option name="METHOD_NAME" value="testCannotReplyToOwnReview" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ReviewTests.testDeleteClientRemovesReviews" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="E2ETests" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="ReviewTests" />
+      <option name="METHOD_NAME" value="testDeleteClientRemovesReviews" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ReviewTests.testDeleteProductRemovesReviews" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="E2ETests" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="ReviewTests" />
+      <option name="METHOD_NAME" value="testDeleteProductRemovesReviews" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.ReviewTests" />
+        <item itemvalue="JUnit.ReviewTests.testDeleteClientRemovesReviews" />
+        <item itemvalue="JUnit.ReviewTests.testDeleteProductRemovesReviews" />
+        <item itemvalue="JUnit.ReviewTests.testCannotReplyToOwnReview" />
+        <item itemvalue="JUnit.ReviewTests.testCannotAddMultipleReviewsSameProduct" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.26830.84" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4fee3299-9dc8-48fe-bfbe-4fab67df825d" name="Changes" comment="" />
+      <created>1777308789988</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1777308789988</updated>
+      <workItem from="1777308790737" duration="28483000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/UserRegistrationTests.java</url>
+          <line>25</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/ProductTests.java</url>
+          <line>175</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/OrderTests.java</url>
+          <line>74</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/OrderTests.java</url>
+          <line>97</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/ReviewTests.java</url>
+          <line>75</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/ReviewTests.java</url>
+          <line>241</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/ReviewTests.java</url>
+          <line>225</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/ReviewTests.java</url>
+          <line>332</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/ReviewTests.java</url>
+          <line>418</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

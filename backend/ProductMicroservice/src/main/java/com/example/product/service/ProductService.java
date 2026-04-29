@@ -231,12 +231,13 @@ public class ProductService {
                 product.getStock(),
                 imageUrls,
                 product.getCategory(),
-                averageRating
+                averageRating,
+                product.getSeller().getId()
         );
     }
 
     public void updateStockFromOrder(OrderStockUpdateMessageDto dto) {
-        if (dto.getProductId() == null) {
+        if (dto.getId() == null) {
             throw new RuntimeException("Product id is required");
         }
 
@@ -244,7 +245,7 @@ public class ProductService {
             throw new RuntimeException("Stock must be 0 or greater");
         }
 
-        Product product = productRepository.findById(dto.getProductId())
+        Product product = productRepository.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         product.setStock(dto.getStock());

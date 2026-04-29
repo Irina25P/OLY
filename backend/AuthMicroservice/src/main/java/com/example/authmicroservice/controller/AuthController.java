@@ -4,7 +4,7 @@ import com.example.authmicroservice.dtos.AuthResponse;
 import com.example.authmicroservice.dtos.RegisterAdminDTO;
 import com.example.authmicroservice.dtos.RegisterClientDTO;
 import com.example.authmicroservice.dtos.RegisterSellerDTO;
-import com.example.authmicroservice.dtos.mappers.AuthRequest;
+import com.example.authmicroservice.dtos.AuthRequest;
 import com.example.authmicroservice.entities.User;
 import com.example.authmicroservice.services.JwtService;
 import com.example.authmicroservice.services.UserService;
@@ -21,7 +21,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

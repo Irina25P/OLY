@@ -18,7 +18,7 @@ public class ClientMessageDTO {
     private String lastName;
     private String email;
     private String username;
-    private String region;
+    private String county;
     private Integer age;
     private String phoneNumber;
     private List<String> interests;

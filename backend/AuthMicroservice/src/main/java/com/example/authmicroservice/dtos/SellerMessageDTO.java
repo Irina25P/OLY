@@ -18,5 +18,5 @@ public class SellerMessageDTO {
     private String username;
     private String imageName;
     private String description;
-    private String region;
+    private String county;
 }

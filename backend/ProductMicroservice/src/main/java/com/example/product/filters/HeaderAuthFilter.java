@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,23 +17,30 @@ import java.util.List;
 
 public class HeaderAuthFilter extends OncePerRequestFilter {
 
+    @Value("${security.user-id-header}")
+    private String userIdHeader;
+
+    @Value("${security.role-header}")
+    private String roleHeader;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String username = request.getHeader("${security.username-header}");
-        String role = request.getHeader("${security.role-header}");
-
         String path = request.getRequestURI();
         if (path.startsWith("/v3/api-docs") ||
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/swagger-resources") ||
-                path.startsWith("/webjars")) {
+                path.startsWith("/webjars") ||
+                path.contains("v1/products/search")) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        String username = request.getHeader(userIdHeader);
+        String role = request.getHeader(roleHeader);
 
         if (username == null || username.isEmpty() || role == null || role.isEmpty()) {
             filterChain.doFilter(request, response);
@@ -49,3 +57,4 @@ public class HeaderAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

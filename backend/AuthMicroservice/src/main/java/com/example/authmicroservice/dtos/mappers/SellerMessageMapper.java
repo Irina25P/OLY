@@ -16,7 +16,7 @@ public class SellerMessageMapper {
                 dto.getUsername(),
                 dto.getImageName(),
                 dto.getDescription(),
-                dto.getRegion()
+                dto.getCounty()
         );
     }
 }
