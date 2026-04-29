@@ -1,26 +1,23 @@
-# build stage
-FROM node:20-alpine AS build
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . .
+
 RUN npm run build
 
-# production stage (nginx)
+
 FROM nginx:alpine
 
-# șterge config default
-RUN rm /etc/nginx/conf.d/default.conf
+RUN apk add --no-cache gettext
 
-# copiază config custom
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/nginx.template
 
-# copiază build-ul
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "envsubst '${BACKEND}' < /etc/nginx/nginx.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]

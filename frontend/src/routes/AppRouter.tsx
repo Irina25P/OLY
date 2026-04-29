@@ -6,6 +6,7 @@ import HomePage from "../pages/public/HomePage"
 import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
 import DashboardPage from "../pages/dashboard/DashboardPage"
+import CheckoutPage from "../pages/clients/CheckoutPage"
 
 function AppRouter() {
   return (
@@ -19,7 +20,7 @@ function AppRouter() {
         <Route element={<MainLayout />}>
           {/* Public page */}
           <Route path="/" element={<HomePage />} />
-
+          <Route path="/checkout" element={<ProtectedRoute allowedRoles={["CLIENT"]}><CheckoutPage /></ProtectedRoute>} />
           {/* Protected pages — requires authentication */}
           <Route
             path="/dashboard"

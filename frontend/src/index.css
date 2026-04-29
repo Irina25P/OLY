@@ -156,10 +156,10 @@ textarea,
 select {
   width: 100%;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-soft);
   color: var(--color-text);
-  padding: 12px 14px;
+  padding: 12px 24px;
   outline: none;
   transition:
     border-color 0.2s ease,
@@ -175,8 +175,8 @@ textarea::placeholder {
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(84, 69, 127, 0.12);
+  border-color: #54457f;
+  /* box-shadow: 1 1 1 3px #54457f1f; */
 }
 
 /* =========================
@@ -292,15 +292,17 @@ select:focus {
 
 ::-webkit-scrollbar-track {
   background: var(--color-bg-soft);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c7c9f8;
-  border-radius: 999px;
+  background: #9ba2ff;
+  border-radius: 10px;
+  border: 2px solid var(--color-bg-muted);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-secondary);
+  background: var(--color-primary);
 }
 
 /* =========================

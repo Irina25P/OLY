@@ -1,13 +1,10 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, Store, Upload, X } from "lucide-react";
-import axios from "axios";
+import { api } from '../../services/api';
 import { useAuth } from "../../context/AuthContext";import { COUNTY_NAMES } from "../../models/romaniaData";import logo from "../../assets/logo.png";
 
 type Role = "client" | "seller";
-
-const IMAGE_SERVICE_URL =
-  import.meta.env.VITE_IMAGE_SERVICE_URL || "http://localhost:8082";
 
 const inputCls =
   "w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none placeholder-gray-400 focus:ring-2 focus:ring-indigo-300";
@@ -99,6 +96,11 @@ function RegisterPage() {
       return;
     }
 
+    if (logoFile === null) {
+      setError("Please upload a logo for your store.");
+      return;
+    }
+
     setLoading(true);
     try {
       if (role === "client") {
@@ -108,24 +110,22 @@ function RegisterPage() {
           email,
           username,
           password,
-          region: county || undefined,
-          age: age ? parseInt(age, 10) : undefined,
-          phoneNumber: phoneNumber || undefined,
-          interests: interests.length > 0 ? interests : undefined,
+          region: county,
+          age: age ? parseInt(age) : 18,
+          phoneNumber: phoneNumber,
+          interests: interests.length > 0 ? interests : [],
         });
       } else {
-        let imageName: string | undefined;
+        let imageName: string;
 
-        if (logoFile) {
-          const formData = new FormData();
-          formData.append("file", logoFile);
-          const uploadRes = await axios.post<{ objectName: string }>(
-            `${IMAGE_SERVICE_URL}/v1/images`,
-            formData,
-            { headers: { "Content-Type": "multipart/form-data" } }
-          );
-          imageName = uploadRes.data.objectName;
-        }
+        
+        const formData = new FormData();
+        formData.append("file", logoFile);
+        const uploadRes = await api.post<{ objectName: string }>(
+          `v1/images`,
+          formData
+        );
+        imageName = uploadRes.data.objectName;
 
         await registerSeller({
           name,
@@ -133,8 +133,8 @@ function RegisterPage() {
           username,
           password,
           imageName,
-          description: description || undefined,
-          region: sellerCounty || undefined,
+          description: description,
+          region: sellerCounty,
         });
       }
       navigate("/login");
