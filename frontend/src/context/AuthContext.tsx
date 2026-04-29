@@ -33,7 +33,7 @@ export interface RegisterClientData {
   email: string;
   username: string;
   password: string;
-  region: string;
+  county: string;
   age: number;
   phoneNumber: string;
   interests: string[];
@@ -46,7 +46,7 @@ export interface RegisterSellerData {
   password: string;
   imageName: string;
   description: string;
-  region: string;
+  county: string;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);

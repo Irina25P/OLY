@@ -44,3 +44,11 @@ export const ROMANIA_COUNTIES: Record<string, string[]> = {
 };
 
 export const COUNTY_NAMES = Object.keys(ROMANIA_COUNTIES).sort();
+
+export const formatCountyForBackend = (county: string): string => {
+  return county
+    .normalize("NFD")              // Break characters into base + diacritic (e.g., 'ț' becomes 't' + ',')
+    .replace(/[\u0300-\u036f]/g, "") // Remove the diacritic marks
+    .toUpperCase()                 // Convert to uppercase
+    .trim();                       // Remove any stray whitespace
+};
