@@ -1,259 +1,117 @@
+import { useState, useEffect } from "react";
 import {
     ChevronDown,
     ChevronLeft,
     ChevronRight,
-    Heart,
     Search,
     ShoppingCart,
 } from "lucide-react";
-import { useState } from "react"
-const products = [
-    {
-        id: 1,
-        title: "Aura Studio ANC Headphones",
-        seller: "SoundScape Tech",
-        price: "$299.00",
-        rating: "2.9",
-        reviews: "128",
-        category: "Electronics",
-        image:
-            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 2,
-        title: "Lumina Series 4 Watch",
-        seller: "WearTech",
-        price: "$199.00",
-        rating: "4.7",
-        reviews: "84",
-        category: "Electronics",
-        image:
-            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 3,
-        title: "Aero Sprint Pro",
-        seller: "Velocity Athletics",
-        price: "$145.00",
-        rating: "4.8",
-        reviews: "312",
-        category: "Fashion",
-        image:
-            "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 4,
-        title: "RetroSnap Instant Camera",
-        seller: "Nostalgia Co.",
-        price: "$89.00",
-        rating: "4.5",
-        reviews: "67",
-        category: "Photography",
-        image:
-            "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 5,
-        title: "Urban Leather Backpack",
-        seller: "CarryLab",
-        price: "$120.00",
-        rating: "4.6",
-        reviews: "91",
-        category: "Fashion",
-        image:
-            "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 6,
-        title: "Minimal Desk Lamp",
-        seller: "HomeGlow",
-        price: "$59.00",
-        rating: "4.4",
-        reviews: "48",
-        category: "Home",
-        image:
-            "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 7,
-        title: "Ceramic Coffee Set",
-        seller: "ClayHouse",
-        price: "$42.00",
-        rating: "4.8",
-        reviews: "73",
-        category: "Home",
-        image:
-            "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 8,
-        title: "Cotton Oversized Hoodie",
-        seller: "SoftWear Studio",
-        price: "$75.00",
-        rating: "4.6",
-        reviews: "156",
-        category: "Fashion",
-        image:
-            "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 9,
-        title: "Bluetooth Speaker Mini",
-        seller: "SoundScape Tech",
-        price: "$64.00",
-        rating: "4.5",
-        reviews: "102",
-        category: "Electronics",
-        image:
-            "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 10,
-        title: "Scented Candle Set",
-        seller: "Aura Home",
-        price: "$38.00",
-        rating: "4.7",
-        reviews: "65",
-        category: "Home",
-        image:
-            "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 11,
-        title: "Classic White Sneakers",
-        seller: "Velocity Athletics",
-        price: "$110.00",
-        rating: "4.9",
-        reviews: "203",
-        category: "Fashion",
-        image:
-            "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 12,
-        title: "Digital Drawing Tablet",
-        seller: "Creative Tech",
-        price: "$219.00",
-        rating: "4.6",
-        reviews: "57",
-        category: "Electronics",
-        image:
-            "https://images.unsplash.com/photo-1561154464-82e9adf32764?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 13,
-        title: "Handmade Wall Art",
-        seller: "Canvas Corner",
-        price: "$95.00",
-        rating: "4.8",
-        reviews: "39",
-        category: "Art",
-        image:
-            "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 14,
-        title: "Wireless Charging Pad",
-        seller: "ChargePoint",
-        price: "$34.00",
-        rating: "4.3",
-        reviews: "77",
-        category: "Electronics",
-        image:
-            "https://images.unsplash.com/photo-1615526675159-e248c3021d3f?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 15,
-        title: "Decorative Plant Pot",
-        seller: "GreenSpace",
-        price: "$28.00",
-        rating: "4.4",
-        reviews: "51",
-        category: "Home",
-        image:
-            "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 16,
-        title: "Travel Duffel Bag",
-        seller: "CarryLab",
-        price: "$132.00",
-        rating: "4.7",
-        reviews: "118",
-        category: "Fashion",
-        image:
-            "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 17,
-        title: "Smart Home Camera",
-        seller: "SecureNest",
-        price: "$159.00",
-        rating: "4.5",
-        reviews: "89",
-        category: "Electronics",
-        image:
-            "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 18,
-        title: "Wooden Serving Tray",
-        seller: "Nordic Home",
-        price: "$49.00",
-        rating: "4.6",
-        reviews: "44",
-        category: "Home",
-        image:
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 19,
-        title: "Silver Minimal Ring",
-        seller: "Luna Jewelry",
-        price: "$72.00",
-        rating: "4.8",
-        reviews: "95",
-        category: "Fashion",
-        image:
-            "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 20,
-        title: "Premium Yoga Mat",
-        seller: "Balance Studio",
-        price: "$68.00",
-        rating: "4.7",
-        reviews: "134",
-        category: "Fitness",
-        image:
-            "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=900&q=80",
-    },
+import { Link } from "react-router-dom";
+import axiosInstance from "../../services/axios";
+import { useCart } from "../../contexts/CartContext";
+import type { InterestType } from "../../models/InterestType";
+import type { Product } from "../../models/Product";
+
+interface ApiProduct {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    imageUrls: string[];
+    category: InterestType;
+    averageRating: number | null;
+}
+
+const ALL_CATEGORIES: InterestType[] = [
+    "ELECTRONICS",
+    "FASHION",
+    "HOME",
+    "BEAUTY",
+    "SPORTS",
+    "TOYS",
+    "BOOKS",
+    "GROCERIES",
 ];
 
+const CATEGORY_LABEL: Record<InterestType, string> = {
+    ELECTRONICS: "Electronics",
+    FASHION: "Fashion",
+    HOME: "Home",
+    BEAUTY: "Beauty",
+    SPORTS: "Sports",
+    TOYS: "Toys",
+    BOOKS: "Books",
+    GROCERIES: "Groceries",
+};
+
+const PLACEHOLDER =
+    "https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&w=900&q=80";
+
+function mapToCartProduct(p: ApiProduct): Product {
+    return {
+        id: p.id,
+        title: p.name,
+        description: p.description,
+        price: p.price,
+        stock: p.stock,
+        imageUrls: p.imageUrls,
+        category: p.category,
+        available: p.stock > 0,
+        averageRating: p.averageRating ?? 0,
+        sellerId: "",
+    };
+}
+
 function ProductCatalogPage() {
-    const [minPrice, setMinPrice] = useState("")
-    const [maxPrice, setMaxPrice] = useState("")
-    const [ratingFilter, setRatingFilter] = useState<number | null>(null)
-    const [searchTerm, setSearchTerm] = useState("")
-    const getNumericPrice = (price: string) => {
-        return Number(price.replace("$", ""))
-    }
+    const [products, setProducts] = useState<ApiProduct[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [selectedCategories, setSelectedCategories] = useState<InterestType[]>([]);
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+    const [ratingFilter, setRatingFilter] = useState<number | null>(null);
 
-    const filteredProducts = products.filter((product) => {
-        const price = getNumericPrice(product.price)
-        const rating = Number(product.rating)
+    const { addToCart, totalItems } = useCart();
 
-        const min = minPrice ? Number(minPrice) : 0
-        const max = maxPrice ? Number(maxPrice) : Infinity
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 400);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
-        const matchesPrice = price >= min && price <= max
-        const matchesRating = ratingFilter ? rating >= ratingFilter : true
-        const matchesSearch = product.title
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase().trim())
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                const params = new URLSearchParams();
+                if (debouncedSearch) params.append("name", debouncedSearch);
+                selectedCategories.forEach((cat) => params.append("categories", cat));
+                if (minPrice) params.append("minPrice", minPrice);
+                if (maxPrice) params.append("maxPrice", maxPrice);
+                if (ratingFilter !== null) params.append("minRating", String(ratingFilter));
 
-        return matchesPrice && matchesRating && matchesSearch
-    })
+                const qs = params.toString();
+                const { data } = await axiosInstance.get<ApiProduct[]>(
+                    `/v1/products${qs ? `?${qs}` : ""}`
+                );
+                setProducts(data);
+            } catch {
+                setProducts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [debouncedSearch, selectedCategories, minPrice, maxPrice, ratingFilter]);
+
+    const toggleCategory = (value: InterestType) => {
+        setSelectedCategories((prev) =>
+            prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]
+        );
+    };
+
     return (
         <div className="min-h-screen w-full bg-[#F7F7F8] text-[#000000]">
             <div className="grid w-full grid-cols-[260px_minmax(0,1fr)]">
@@ -269,24 +127,28 @@ function ProductCatalogPage() {
                         </h3>
 
                         <div className="space-y-3 text-[13px] text-gray-700">
-                            {[
-                                "All Products",
-                                "Electronics",
-                                "Fashion & Apparel",
-                                "Home Goods",
-                                "Art & Collectibles",
-                                "Fitness",
-                            ].map((category, index) => (
+                            <label className="flex cursor-pointer items-center gap-3 text-left leading-5">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedCategories.length === 0}
+                                    onChange={() => setSelectedCategories([])}
+                                    className="!h-4 !w-4 !shrink-0 !rounded !p-0 accent-[#54457F]"
+                                />
+                                <span className="block flex-1">All Products</span>
+                            </label>
+
+                            {ALL_CATEGORIES.map((category) => (
                                 <label
                                     key={category}
                                     className="flex cursor-pointer items-center gap-3 text-left leading-5"
                                 >
                                     <input
                                         type="checkbox"
-                                        defaultChecked={index === 0}
+                                        checked={selectedCategories.includes(category)}
+                                        onChange={() => toggleCategory(category)}
                                         className="!h-4 !w-4 !shrink-0 !rounded !p-0 accent-[#54457F]"
                                     />
-                                    <span className="block flex-1">{category}</span>
+                                    <span className="block flex-1">{CATEGORY_LABEL[category]}</span>
                                 </label>
                             ))}
                         </div>
@@ -322,41 +184,25 @@ function ProductCatalogPage() {
                         </h3>
 
                         <div className="space-y-3 text-[13px] text-gray-700">
-                            <label className="flex cursor-pointer items-center gap-3 leading-5">
-                                <input
-                                    type="radio"
-                                    name="rating"
-                                    onChange={() => setRatingFilter(5)}
-                                    checked={ratingFilter === 5}
-                                    className="!h-4 !w-4 accent-[#54457F]"
-                                />
-                                <span className="text-[#F6B21A]">★★★★★</span>
-                                <span className="text-gray-500">& Up</span>
-                            </label>
+                            {([5, 4, 3] as const).map((stars) => (
+                                <label
+                                    key={stars}
+                                    className="flex cursor-pointer items-center gap-3 leading-5"
+                                >
+                                    <input
+                                        type="radio"
+                                        name="rating"
+                                        onChange={() => setRatingFilter(stars)}
+                                        checked={ratingFilter === stars}
+                                        className="!h-4 !w-4 accent-[#54457F]"
+                                    />
+                                    <span className="text-[#F6B21A]">
+                                        {"★".repeat(stars)}{"☆".repeat(5 - stars)}
+                                    </span>
+                                    <span className="text-gray-500">& Up</span>
+                                </label>
+                            ))}
 
-                            <label className="flex cursor-pointer items-center gap-3 leading-5">
-                                <input
-                                    type="radio"
-                                    name="rating"
-                                    onChange={() => setRatingFilter(4)}
-                                    checked={ratingFilter === 4}
-                                    className="!h-4 !w-4 accent-[#54457F]"
-                                />
-                                <span className="text-[#F6B21A]">★★★★☆</span>
-                                <span className="text-gray-500">& Up</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center gap-3 leading-5">
-                                <input
-                                    type="radio"
-                                    name="rating"
-                                    onChange={() => setRatingFilter(3)}
-                                    checked={ratingFilter === 3}
-                                    className="!h-4 !w-4 accent-[#54457F]"
-                                />
-                                <span className="text-[#F6B21A]">★★★☆☆</span>
-                                <span className="text-gray-500">& Up</span>
-                            </label>
                             <label className="flex cursor-pointer items-center gap-3 leading-5">
                                 <input
                                     type="radio"
@@ -392,12 +238,14 @@ function ProductCatalogPage() {
                                 Shop All
                             </h1>
                             <p className="mt-4 text-base text-gray-600">
-                                Showing {filteredProducts.length} of {products.length} products
+                                {loading
+                                    ? "Loading..."
+                                    : `Showing ${products.length} product${products.length !== 1 ? "s" : ""}`}
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-6">
-                            <div className="flex h-12 w-[460px] items-center gap-3 rounded-full border border-gray-200 bg-white px-5 shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-[400px] items-center gap-3 rounded-full border border-gray-200 bg-white px-5 shadow-sm">
                                 <Search size={20} className="shrink-0 text-gray-400" />
                                 <input
                                     placeholder="Search products..."
@@ -406,6 +254,18 @@ function ProductCatalogPage() {
                                     className="!h-full !min-w-0 !flex-1 !border-0 !bg-transparent !p-0 !text-sm !text-gray-700 !shadow-none !outline-none focus:!border-0 focus:!shadow-none focus:!outline-none"
                                 />
                             </div>
+
+                            <Link
+                                to="/checkout"
+                                className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm text-gray-700 transition hover:text-[#54457F]"
+                            >
+                                <ShoppingCart size={22} />
+                                {totalItems > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-[#54457F] px-1 text-[10px] font-bold text-white">
+                                        {totalItems}
+                                    </span>
+                                )}
+                            </Link>
 
                             <div className="flex items-center gap-3">
                                 <span className="text-sm text-gray-600">Sort by:</span>
@@ -418,76 +278,88 @@ function ProductCatalogPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-6 2xl:grid-cols-5">
-                        {filteredProducts.map((product) => (
-                            <article
-                                key={product.id}
-                                className="flex h-[390px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-                            >
-                                <div className="relative h-[180px] bg-[#F1F1F1]">
-                                    <img
-                                        src={product.image}
-                                        alt={product.title}
-                                        className="h-full w-full object-cover"
-                                    />
+                    {loading ? (
+                        <div className="flex items-center justify-center py-24 text-gray-400">
+                            Loading products...
+                        </div>
+                    ) : products.length === 0 ? (
+                        <div className="flex items-center justify-center py-24 text-gray-400">
+                            No products found.
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-4 gap-6 2xl:grid-cols-5">
+                            {products.map((product) => (
+                                <article
+                                    key={product.id}
+                                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                                >
+                                    <div className="h-[180px] bg-[#F1F1F1]">
+                                        <img
+                                            src={product.imageUrls?.[0] || PLACEHOLDER}
+                                            alt={product.name}
+                                            className="h-full w-full object-cover"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = PLACEHOLDER;
+                                            }}
+                                        />
+                                    </div>
 
-                                    <button className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-gray-600 shadow-sm transition hover:text-[#E85D75]">
-                                        <Heart size={20} />
-                                    </button>
-                                </div>
-
-                                <div className="flex flex-1 flex-col p-4">
-                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#54457F]">
-                                        {product.category}
-                                    </p>
-
-                                    <div className="flex items-start justify-between gap-3">
-                                        <h3 className="line-clamp-2 text-[18px] font-extrabold leading-[1.15] text-black">
-                                            {product.title}
-                                        </h3>
-
-                                        <p className="whitespace-nowrap text-[15px] font-bold text-black">
-                                            {product.price}
+                                    <div className="flex flex-1 flex-col p-4">
+                                        <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#54457F]">
+                                            {CATEGORY_LABEL[product.category] ?? product.category}
                                         </p>
+
+                                        <div className="flex items-start justify-between gap-3">
+                                            <h3 className="line-clamp-2 text-[16px] font-extrabold leading-[1.15] text-black">
+                                                {product.name}
+                                            </h3>
+
+                                            <p className="whitespace-nowrap text-[15px] font-bold text-black">
+                                                ${product.price.toFixed(2)}
+                                            </p>
+                                        </div>
+
+                                        <div className="mt-3 flex items-center gap-1 text-[13px]">
+                                            {product.averageRating !== null ? (
+                                                <>
+                                                    <span className="text-[#F6B21A]">★</span>
+                                                    <span className="font-medium text-black">
+                                                        {product.averageRating.toFixed(1)}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className="text-[12px] text-gray-400">No reviews yet</span>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            onClick={() => addToCart(mapToCartProduct(product))}
+                                            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[14px] font-medium text-black transition hover:bg-[#54457F] hover:text-white hover:border-[#54457F]"
+                                        >
+                                            <ShoppingCart size={16} />
+                                            Add to Cart
+                                        </button>
                                     </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
 
-                                    <p className="mt-3 text-[14px] text-gray-500">
-                                        By {product.seller}
-                                    </p>
+                    {!loading && products.length > 0 && (
+                        <div className="mt-10 flex items-center justify-center gap-5 text-sm">
+                            <button className="text-gray-400">
+                                <ChevronLeft size={18} />
+                            </button>
 
-                                    <div className="mt-4 flex items-center gap-1 text-[14px]">
-                                        <span className="text-[#F6B21A]">★</span>
-                                        <span className="font-medium text-black">{product.rating}</span>
-                                        <span className="text-gray-500">({product.reviews})</span>
-                                    </div>
+                            <button className="rounded-lg bg-[#E9E7FF] px-4 py-3 font-semibold text-[#54457F]">
+                                1
+                            </button>
 
-                                    <button className="mt-auto flex w-full items-center justify-center gap-2 border-t border-gray-100 bg-white py-3 text-[15px] font-medium text-black transition hover:!bg-[#54457F] hover:text-white">
-                                        <ShoppingCart size={18} />
-                                        Add to Cart
-                                    </button>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
-
-                    <div className="mt-10 flex items-center justify-center gap-5 text-sm">
-                        <button className="text-gray-400">
-                            <ChevronLeft size={18} />
-                        </button>
-
-                        <button className="rounded-lg bg-[#E9E7FF] px-4 py-3 font-semibold text-[#54457F]">
-                            1
-                        </button>
-
-                        <button>2</button>
-                        <button>3</button>
-                        <span>...</span>
-                        <button>20</button>
-
-                        <button>
-                            <ChevronRight size={18} />
-                        </button>
-                    </div>
+                            <button>
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                    )}
                 </main>
             </div>
         </div>

@@ -255,23 +255,9 @@ services:
     networks:
       - oly_net
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    restart: always
-    depends_on:
-      - auth-service
-      - user-service
-      - product-service
-      - order-service
-      - image-service
-    networks:
-      - oly_net
 
 volumes:
-  rabbitmq_data:
+  rabbitmq-data:
 
 networks:
   oly_net:
