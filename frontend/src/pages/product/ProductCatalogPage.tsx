@@ -461,7 +461,7 @@ function ProductCatalogPage() {
                                         <span className="text-gray-500">({product.reviews})</span>
                                     </div>
 
-                                    <button className="mt-auto flex w-full items-center justify-center gap-2 border-t border-gray-100 bg-white py-3 text-[15px] font-medium text-black transition hover:bg-[#54457F] hover:text-white">
+                                    <button className="mt-auto flex w-full items-center justify-center gap-2 border-t border-gray-100 bg-white py-3 text-[15px] font-medium text-black transition hover:!bg-[#54457F] hover:text-white">
                                         <ShoppingCart size={18} />
                                         Add to Cart
                                     </button>

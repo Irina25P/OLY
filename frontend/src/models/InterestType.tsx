@@ -1,0 +1,1 @@
+export type InterestType = "ELECTRONICS" | "FASHION" | "HOME" | "BEAUTY" | "SPORTS" | "TOYS" | "BOOKS" | "GROCERIES";

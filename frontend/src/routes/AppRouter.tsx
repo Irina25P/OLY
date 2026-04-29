@@ -10,6 +10,7 @@ import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
 import DashboardPage from "../pages/dashboard/DashboardPage"
 import ProductCatalogPage from "../pages/product/ProductCatalogPage"
+import CheckoutPage from "../pages/clients/CheckoutPage"
 
 import SellerOverviewPage from "../pages/seller/SellerOverviewPage"
 import SellerProductsPage from "../pages/seller/SellerProductsPage"
@@ -22,14 +23,21 @@ function AppRouter() {
     return (
         <AuthProvider>
             <Routes>
-                {/* Auth pages */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
-                {/* Public buyer pages */}
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/products" element={<ProductCatalogPage />} />
+
+                    <Route
+                        path="/checkout"
+                        element={
+                            <ProtectedRoute allowedRoles={["CLIENT"]}>
+                                <CheckoutPage />
+                            </ProtectedRoute>
+                        }
+                    />
 
                     <Route
                         path="/dashboard"
@@ -41,7 +49,6 @@ function AppRouter() {
                     />
                 </Route>
 
-                {/* Seller dashboard pages */}
                 <Route element={<SellerLayout />}>
                     <Route path="/seller" element={<SellerOverviewPage />} />
                     <Route path="/seller/products" element={<SellerProductsPage />} />
