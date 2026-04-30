@@ -1,2 +1,15 @@
 172.18.0.1 - - [29/Apr/2026:18:15:22 +0000] "GET /api/v1/images HTTP/1.1" 405 284 "-" "-" 1 "image-management-api@file" "http://image-management-service:8080" 750ms
 172.18.0.1 - - [29/Apr/2026:18:15:23 +0000] "GET /favicon.ico HTTP/1.1" 200 627 "-" "-" 2 "frontend@file" "http://frontend:80" 7ms
+172.18.0.1 - - [29/Apr/2026:18:36:21 +0000] "GET /register HTTP/1.1" 200 627 "-" "-" 1 "frontend@file" "http://frontend:80" 14ms
+172.18.0.1 - - [29/Apr/2026:18:36:21 +0000] "GET /assets/index-BGG4OXc0.js HTTP/1.1" 200 347204 "-" "-" 2 "frontend@file" "http://frontend:80" 27ms
+172.18.0.1 - - [29/Apr/2026:18:36:21 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 200 627 "-" "-" 4 "frontend@file" "http://frontend:80" 0ms
+172.18.0.1 - - [29/Apr/2026:18:36:21 +0000] "GET /assets/index-C7-UDUNe.css HTTP/1.1" 200 48089 "-" "-" 3 "frontend@file" "http://frontend:80" 27ms
+172.18.0.1 - - [29/Apr/2026:18:36:21 +0000] "GET /assets/logo-BehX-Mzd.png HTTP/1.1" 200 45494 "-" "-" 5 "frontend@file" "http://frontend:80" 9ms
+172.18.0.1 - - [29/Apr/2026:18:36:21 +0000] "GET /favicon.svg HTTP/1.1" 200 9522 "-" "-" 6 "frontend@file" "http://frontend:80" 7ms
+172.18.0.1 - - [29/Apr/2026:18:42:05 +0000] "POST /api/v1/auth/register/client HTTP/1.1" 403 0 "-" "-" 7 "auth-api@file" "http://auth-service:8080" 1087ms
+172.18.0.1 - - [29/Apr/2026:18:42:22 +0000] "GET /register HTTP/1.1" 502 11 "-" "-" 8 "frontend@file" "http://frontend:80" 8008ms
+172.18.0.1 - - [29/Apr/2026:18:42:30 +0000] "GET /favicon.ico HTTP/1.1" 499 21 "-" "-" 10 "frontend@file" "http://frontend:80" 3189ms
+172.18.0.1 - - [29/Apr/2026:18:42:30 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 502 11 "-" "-" 9 "frontend@file" "http://frontend:80" 8024ms
+172.18.0.1 - - [29/Apr/2026:18:42:40 +0000] "GET /login HTTP/1.1" 502 11 "-" "-" 11 "frontend@file" "http://frontend:80" 8004ms
+172.18.0.1 - - [29/Apr/2026:18:42:48 +0000] "GET /favicon.ico HTTP/1.1" 502 11 "-" "-" 13 "frontend@file" "http://frontend:80" 7985ms
+172.18.0.1 - - [29/Apr/2026:18:42:48 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 502 11 "-" "-" 12 "frontend@file" "http://frontend:80" 8004ms
