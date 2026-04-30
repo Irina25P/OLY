@@ -6,6 +6,7 @@ import HomePage from "../pages/public/HomePage"
 import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
 import DashboardPage from "../pages/dashboard/DashboardPage"
+import ClientProfile from "../pages/dashboard/ClientProfile"
 import CheckoutPage from "../pages/clients/CheckoutPage"
 
 function AppRouter() {
@@ -27,6 +28,16 @@ function AppRouter() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Client-only pages */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowedRoles={["CLIENT"]}>
+                <ClientProfile />
               </ProtectedRoute>
             }
           />
