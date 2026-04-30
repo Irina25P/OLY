@@ -10,6 +10,7 @@ import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
 import DashboardPage from "../pages/dashboard/DashboardPage"
 import ProductCatalogPage from "../pages/product/ProductCatalogPage"
+import ClientProfile from "../pages/dashboard/ClientProfile"
 import CheckoutPage from "../pages/clients/CheckoutPage"
 
 import SellerOverviewPage from "../pages/seller/SellerOverviewPage"
@@ -35,6 +36,15 @@ function AppRouter() {
                         element={
                             <ProtectedRoute allowedRoles={["CLIENT"]}>
                                 <CheckoutPage />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute allowedRoles={["CLIENT"]}>
+                                <ClientProfile />
                             </ProtectedRoute>
                         }
                     />

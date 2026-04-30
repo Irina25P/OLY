@@ -3,8 +3,6 @@ name: E2E Integration Tests
 on:
   push:
     branches: [ main, 'BE/**', 'FE/**' ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   e2e-tests:

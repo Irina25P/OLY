@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, Store, Upload, X } from "lucide-react";
 import { api } from '../../services/api';
 import { useAuth } from "../../context/AuthContext";import { COUNTY_NAMES, formatCountyForBackend } from "../../models/romaniaData";import logo from "../../assets/logo.png";
+import { interestOptions } from "../../models/interests";
 
 type Role = "client" | "seller";
 
@@ -44,15 +45,6 @@ function RegisterPage() {
   const [age, setAge] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
-
-  const interestOptions = [
-    { value: "ELECTRONICS_IT", label: "Electronics & IT" },
-    { value: "FASHION_ACCESSORIES", label: "Fashion & Accessories" },
-    { value: "HOME_GARDEN", label: "Home & Garden" },
-    { value: "AUTO_MOTO", label: "Auto & Moto" },
-    { value: "SPORTS_OUTDOOR", label: "Sports & Outdoor" },
-    { value: "GAMES_GAMING", label: "Games & Gaming" },
-  ];
 
   const toggleInterest = (interestValue: string) => {
     setInterests((prev) =>
@@ -114,7 +106,8 @@ function RegisterPage() {
         let imageName: string;
 
         if (logoFile === null) {
-          setError("Please upload a logo for your store.");
+          setError("Please upload a store logo.");
+          setLoading(false);
           return;
         }
         
