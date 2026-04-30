@@ -258,7 +258,6 @@ services:
 volumes:
   rabbitmq-data:
 
-
 networks:
   oly_net:
     external: true
