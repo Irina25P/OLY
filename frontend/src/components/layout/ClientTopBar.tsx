@@ -35,7 +35,7 @@ const ClientTopBar = () => {
       <nav className="flex gap-8 mx-8">
         <Link to="/products" className={getLinkClass('/')}>Products</Link>
         <Link to="/orders" className={getLinkClass('/orders')}>Orders</Link>
-        <Link to="/settings" className={getLinkClass('/settings')}>Profile</Link>
+        <Link to="/profile" className={getLinkClass('/profile')}>Profile</Link>
       </nav>
 
       {/* Right Side: Icons and Auth */}
