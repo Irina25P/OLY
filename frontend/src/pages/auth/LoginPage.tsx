@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/logo.png";
 
@@ -20,7 +21,9 @@ function LoginPage() {
     setLoading(true);
     try {
       await login(username, password);
-      navigate("/dashboard");
+      const stored = localStorage.getItem("token");
+      const role = stored ? jwtDecode<{ role: string }>(stored).role : null;
+      navigate(role === "SELLER" ? "/seller" : "/dashboard");
     } catch {
       setError("Invalid credentials. Please try again.");
     } finally {

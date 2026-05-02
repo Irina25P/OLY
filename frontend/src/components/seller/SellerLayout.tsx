@@ -8,8 +8,9 @@ import {
     MessageSquareText,
     Settings,
 } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
     { label: "Dashboard", path: "/seller", icon: Grid2X2 },
@@ -21,9 +22,17 @@ const navItems = [
 ];
 
 function SellerLayout() {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    };
+
     return (
         <div className="flex min-h-screen w-full bg-[#F8F8F8] text-[#000000]">
-            <aside className="flex w-[260px] shrink-0 flex-col border-r border-gray-200 bg-[#F4F7FB] px-6 py-6">
+            <aside className="sticky top-0 flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-[#F4F7FB] px-6 py-6">
                 <div>
                     <img src={logo} alt="OLY logo" className="h-16 w-16 object-contain" />
 
@@ -66,7 +75,10 @@ function SellerLayout() {
                         Help Center
                     </button>
 
-                    <button className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#65758F] hover:text-[#E85D75]">
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#65758F] hover:text-[#E85D75]"
+                    >
                         <LogOut size={18} />
                         Logout
                     </button>

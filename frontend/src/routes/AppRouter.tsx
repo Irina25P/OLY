@@ -59,7 +59,13 @@ function AppRouter() {
                     />
                 </Route>
 
-                <Route element={<SellerLayout />}>
+                <Route
+                    element={
+                        <ProtectedRoute allowedRoles={["SELLER"]}>
+                            <SellerLayout />
+                        </ProtectedRoute>
+                    }
+                >
                     <Route path="/seller" element={<SellerOverviewPage />} />
                     <Route path="/seller/products" element={<SellerProductsPage />} />
                     <Route path="/seller/orders" element={<SellerOrdersPage />} />
