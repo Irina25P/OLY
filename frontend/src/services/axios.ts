@@ -1,4 +1,6 @@
 import axios from "axios";
+import { COOKIE_JWT } from "../constants/constants.tsx";
+import Cookies from "js-cookie";
 
 const axiosInstance = axios.create({
     baseURL: "http://localhost/api",

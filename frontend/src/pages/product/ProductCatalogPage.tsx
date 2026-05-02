@@ -6,6 +6,7 @@ import {
     Search,
     ShoppingCart,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/axios";
 import { useCart } from "../../contexts/CartContext";
 import type { InterestType } from "../../models/InterestType";
@@ -89,6 +90,7 @@ function ProductCatalogPage() {
     const sortRef = useRef<HTMLDivElement>(null);
 
     const { addToCart } = useCart();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 400);
@@ -328,7 +330,8 @@ function ProductCatalogPage() {
                             {sortedProducts.map((product) => (
                                 <article
                                     key={product.id}
-                                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                                    onClick={() => navigate(`/products/${product.id}`, { state: { product } })}
+                                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md cursor-pointer"
                                 >
                                     <div className="h-[180px] bg-[#F1F1F1]">
                                         <img
@@ -370,7 +373,7 @@ function ProductCatalogPage() {
                                         </div>
 
                                         <button
-                                            onClick={() => addToCart(mapToCartProduct(product))}
+                                            onClick={(e) => { e.stopPropagation(); addToCart(mapToCartProduct(product)); }}
                                             onMouseEnter={() => setHoveredId(product.id)}
                                             onMouseLeave={() => setHoveredId(null)}
                                             style={
