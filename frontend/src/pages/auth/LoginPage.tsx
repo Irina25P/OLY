@@ -23,7 +23,7 @@ function LoginPage() {
       await login(username, password);
       const stored = localStorage.getItem("token");
       const role = stored ? jwtDecode<{ role: string }>(stored).role : null;
-      navigate(role === "SELLER" ? "/seller" : "/dashboard");
+      navigate(role === "SELLER" ? "/seller" : "/products");
     } catch {
       setError("Invalid credentials. Please try again.");
     } finally {
