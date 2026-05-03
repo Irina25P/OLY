@@ -52,16 +52,16 @@ function LoginPage() {
               </div>
             )}
 
-            {/* Email / Username */}
+            {/* Username */}
             <div>
               <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                Email Address
+                Username
               </label>
               <div className="flex items-center rounded-xl px-4 py-3 gap-2">
                 <Mail className="w-4 h-4 text-gray-400 shrink-0" />
                 <input
                   type="text"
-                  placeholder="name@example.com"
+                  placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
