@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     ChevronDown,
     ChevronLeft,
@@ -6,7 +6,7 @@ import {
     Search,
     ShoppingCart,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/axios";
 import { useCart } from "../../contexts/CartContext";
 import type { InterestType } from "../../models/InterestType";
@@ -19,34 +19,38 @@ interface ApiProduct {
     price: number;
     stock: number;
     imageUrls: string[];
-    category: InterestType;
+    category: string;
     averageRating: number | null;
 }
 
-const ALL_CATEGORIES: InterestType[] = [
-    "ELECTRONICS",
-    "FASHION",
-    "HOME",
-    "BEAUTY",
-    "SPORTS",
-    "TOYS",
-    "BOOKS",
-    "GROCERIES",
+const ALL_CATEGORIES: string[] = [
+    "ELECTRONICS_IT",
+    "FASHION_ACCESSORIES",
+    "HOME_GARDEN",
+    "AUTO_MOTO",
+    "SPORTS_OUTDOOR",
+    "GAMES_GAMING",
 ];
 
-const CATEGORY_LABEL: Record<InterestType, string> = {
-    ELECTRONICS: "Electronics",
-    FASHION: "Fashion",
-    HOME: "Home",
-    BEAUTY: "Beauty",
-    SPORTS: "Sports",
-    TOYS: "Toys",
-    BOOKS: "Books",
-    GROCERIES: "Groceries",
+const CATEGORY_LABEL: Record<string, string> = {
+    ELECTRONICS_IT:      "Electronics",
+    FASHION_ACCESSORIES: "Fashion",
+    HOME_GARDEN:         "Home",
+    AUTO_MOTO:           "Auto & Moto",
+    SPORTS_OUTDOOR:      "Sports",
+    GAMES_GAMING:        "Games",
 };
 
 const PLACEHOLDER =
     "https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&w=900&q=80";
+
+const MINIO_BASE = "http://92.5.49.167:9000/disi-images";
+
+function imageUrl(objectName: string | undefined): string {
+    if (!objectName) return PLACEHOLDER;
+    if (objectName.startsWith("http")) return objectName;
+    return `${MINIO_BASE}/${objectName}`;
+}
 
 function mapToCartProduct(p: ApiProduct): Product {
     return {
@@ -56,24 +60,37 @@ function mapToCartProduct(p: ApiProduct): Product {
         price: p.price,
         stock: p.stock,
         imageUrls: p.imageUrls,
-        category: p.category,
+        category: p.category as InterestType,
         available: p.stock > 0,
         averageRating: p.averageRating ?? 0,
         sellerId: "",
     };
 }
 
+type SortOption = "recommended" | "price-asc" | "price-desc";
+
+const SORT_LABELS: Record<SortOption, string> = {
+    "recommended": "Recommended",
+    "price-asc":   "Price: Low to High",
+    "price-desc":  "Price: High to Low",
+};
+
 function ProductCatalogPage() {
     const [products, setProducts] = useState<ApiProduct[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [selectedCategories, setSelectedCategories] = useState<InterestType[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+    const [sortBy, setSortBy] = useState<SortOption>("recommended");
+    const [sortOpen, setSortOpen] = useState(false);
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const sortRef = useRef<HTMLDivElement>(null);
 
-    const { addToCart, totalItems } = useCart();
+    const { addToCart } = useCart();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 400);
@@ -93,7 +110,7 @@ function ProductCatalogPage() {
 
                 const qs = params.toString();
                 const { data } = await axiosInstance.get<ApiProduct[]>(
-                    `/v1/products${qs ? `?${qs}` : ""}`
+                    `/v1/products/search${qs ? `?${qs}` : ""}`
                 );
                 setProducts(data);
             } catch {
@@ -106,11 +123,27 @@ function ProductCatalogPage() {
         fetchProducts();
     }, [debouncedSearch, selectedCategories, minPrice, maxPrice, ratingFilter]);
 
-    const toggleCategory = (value: InterestType) => {
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+                setSortOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const toggleCategory = (value: string) => {
         setSelectedCategories((prev) =>
             prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]
         );
     };
+
+    const sortedProducts = [...products].sort((a, b) => {
+        if (sortBy === "price-asc") return a.price - b.price;
+        if (sortBy === "price-desc") return b.price - a.price;
+        return 0;
+    });
 
     return (
         <div className="min-h-screen w-full bg-[#F7F7F8] text-[#000000]">
@@ -255,25 +288,31 @@ function ProductCatalogPage() {
                                 />
                             </div>
 
-                            <Link
-                                to="/checkout"
-                                className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm text-gray-700 transition hover:text-[#54457F]"
-                            >
-                                <ShoppingCart size={22} />
-                                {totalItems > 0 && (
-                                    <span className="absolute -top-1 -right-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-[#54457F] px-1 text-[10px] font-bold text-white">
-                                        {totalItems}
-                                    </span>
-                                )}
-                            </Link>
-
-                            <div className="flex items-center gap-3">
+                            <div ref={sortRef} className="relative flex items-center gap-3">
                                 <span className="text-sm text-gray-600">Sort by:</span>
 
-                                <button className="flex h-12 items-center gap-10 rounded-full border border-gray-200 bg-white px-5 text-sm text-gray-700 shadow-sm">
-                                    Recommended
+                                <button
+                                    onClick={() => setSortOpen((o) => !o)}
+                                    className="flex h-12 items-center gap-6 rounded-full border border-gray-200 bg-white px-5 text-sm text-gray-700 shadow-sm"
+                                >
+                                    {SORT_LABELS[sortBy]}
                                     <ChevronDown size={16} />
                                 </button>
+
+                                {sortOpen && (
+                                    <div className="absolute right-0 top-14 z-20 w-52 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+                                        {(Object.keys(SORT_LABELS) as SortOption[]).map((opt) => (
+                                            <button
+                                                key={opt}
+                                                onClick={() => { setSortBy(opt); setSortOpen(false); }}
+                                                className="w-full px-5 py-3 text-left text-sm text-gray-700 hover:bg-gray-50"
+                                                style={sortBy === opt ? { color: "#54457F", fontWeight: 600 } : {}}
+                                            >
+                                                {SORT_LABELS[opt]}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -282,20 +321,21 @@ function ProductCatalogPage() {
                         <div className="flex items-center justify-center py-24 text-gray-400">
                             Loading products...
                         </div>
-                    ) : products.length === 0 ? (
+                    ) : sortedProducts.length === 0 ? (
                         <div className="flex items-center justify-center py-24 text-gray-400">
                             No products found.
                         </div>
                     ) : (
                         <div className="grid grid-cols-4 gap-6 2xl:grid-cols-5">
-                            {products.map((product) => (
+                            {sortedProducts.map((product) => (
                                 <article
                                     key={product.id}
-                                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                                    onClick={() => navigate(`/products/${product.id}`, { state: { product } })}
+                                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md cursor-pointer"
                                 >
                                     <div className="h-[180px] bg-[#F1F1F1]">
                                         <img
-                                            src={product.imageUrls?.[0] || PLACEHOLDER}
+                                            src={imageUrl(product.imageUrls?.[0])}
                                             alt={product.name}
                                             className="h-full w-full object-cover"
                                             onError={(e) => {
@@ -320,7 +360,7 @@ function ProductCatalogPage() {
                                         </div>
 
                                         <div className="mt-3 flex items-center gap-1 text-[13px]">
-                                            {product.averageRating !== null ? (
+                                            {product.averageRating !== null && product.averageRating > 0 ? (
                                                 <>
                                                     <span className="text-[#F6B21A]">★</span>
                                                     <span className="font-medium text-black">
@@ -328,13 +368,20 @@ function ProductCatalogPage() {
                                                     </span>
                                                 </>
                                             ) : (
-                                                <span className="text-[12px] text-gray-400">No reviews yet</span>
+                                                <span className="text-[12px] text-gray-400">No ratings</span>
                                             )}
                                         </div>
 
                                         <button
-                                            onClick={() => addToCart(mapToCartProduct(product))}
-                                            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[14px] font-medium text-black transition hover:bg-[#54457F] hover:text-white hover:border-[#54457F]"
+                                            onClick={(e) => { e.stopPropagation(); addToCart(mapToCartProduct(product)); }}
+                                            onMouseEnter={() => setHoveredId(product.id)}
+                                            onMouseLeave={() => setHoveredId(null)}
+                                            style={
+                                                hoveredId === product.id
+                                                    ? { backgroundColor: "#54457F", color: "#fff", borderColor: "#54457F" }
+                                                    : {}
+                                            }
+                                            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[14px] font-medium text-black transition-colors"
                                         >
                                             <ShoppingCart size={16} />
                                             Add to Cart
@@ -345,7 +392,7 @@ function ProductCatalogPage() {
                         </div>
                     )}
 
-                    {!loading && products.length > 0 && (
+                    {!loading && sortedProducts.length > 0 && (
                         <div className="mt-10 flex items-center justify-center gap-5 text-sm">
                             <button className="text-gray-400">
                                 <ChevronLeft size={18} />

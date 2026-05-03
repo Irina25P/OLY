@@ -10,6 +10,7 @@ import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
 import DashboardPage from "../pages/dashboard/DashboardPage"
 import ProductCatalogPage from "../pages/product/ProductCatalogPage"
+import ProductDetailPage from "../pages/product/ProductDetailPage"
 import ClientProfile from "../pages/dashboard/ClientProfile"
 import CheckoutPage from "../pages/clients/CheckoutPage"
 
@@ -30,6 +31,7 @@ function AppRouter() {
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/products" element={<ProductCatalogPage />} />
+                    <Route path="/products/:id" element={<ProductDetailPage />} />
 
                     <Route
                         path="/checkout"
@@ -59,7 +61,13 @@ function AppRouter() {
                     />
                 </Route>
 
-                <Route element={<SellerLayout />}>
+                <Route
+                    element={
+                        <ProtectedRoute allowedRoles={["SELLER"]}>
+                            <SellerLayout />
+                        </ProtectedRoute>
+                    }
+                >
                     <Route path="/seller" element={<SellerOverviewPage />} />
                     <Route path="/seller/products" element={<SellerProductsPage />} />
                     <Route path="/seller/orders" element={<SellerOrdersPage />} />
