@@ -21,6 +21,7 @@ interface ApiProduct {
     imageUrls: string[];
     category: string;
     averageRating: number | null;
+    sellerId: string | null;
 }
 
 const ALL_CATEGORIES: string[] = [
@@ -63,7 +64,7 @@ function mapToCartProduct(p: ApiProduct): Product {
         category: p.category as InterestType,
         available: p.stock > 0,
         averageRating: p.averageRating ?? 0,
-        sellerId: "",
+        sellerId: p.sellerId ?? "unknown",
     };
 }
 
