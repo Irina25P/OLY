@@ -1,12 +1,13 @@
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 import { COOKIE_JWT, type JwtPayload } from '../constants/constants';
 import type { CardForm, PaymentMethod, ShippingForm } from '../models/CheckoutModels';
 
 export const getClientIdFromJwt = (): string | null => {
-  const token = Cookies.get(COOKIE_JWT);
+  const token = Cookies.get(COOKIE_JWT) ?? localStorage.getItem('token');
   if (!token) return null;
   try {
-    const payload: JwtPayload = JSON.parse(atob(token.split('.')[1]));
+    const payload = jwtDecode<JwtPayload>(token);
     return payload.userId;
   } catch {
     return null;

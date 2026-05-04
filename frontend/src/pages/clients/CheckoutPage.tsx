@@ -11,7 +11,7 @@ import {
   isCardValid,
   isShippingValid,
 } from '../../validators/checkoutValidations';
-import { COUNTY_NAMES, ROMANIA_COUNTIES } from '../../models/romaniaData';
+import { COUNTY_NAMES, formatCountyForBackend, ROMANIA_COUNTIES } from '../../models/romaniaData';
 
 const CheckoutPage = () => {
   const { cartItems, totalPrice, clearCart } = useCart();
@@ -81,6 +81,8 @@ const CheckoutPage = () => {
     setError(null);
     setLoading(true);
 
+    console.log(cartItems);
+
     // Group cart items by sellerId
     const itemsBySeller = cartItems.reduce<Record<string, typeof cartItems>>((acc, item) => {
       const key = item.sellerId;
@@ -90,15 +92,18 @@ const CheckoutPage = () => {
     }, {});
     console.log(itemsBySeller)
 
+    console.log(formatCountyForBackend(shipping.county.trim()));
+    console.log(clientId, paymentMethod, shipping.city.trim(), shipping.street.trim());
+
     try {
       const requests = Object.entries(itemsBySeller).map(([sellerId, items]) =>
-        api.post('/v1/orders/', {
+        api.post('/v1/orders', {
           order: {
             clientId,
             sellerId,
-            statusType: 'PLACED',
+            statusType: "PLACED",
             payment: paymentMethod,
-            county: shipping.county.trim(),
+            county: formatCountyForBackend(shipping.county.trim()),
             city: shipping.city.trim(),
             street: shipping.street.trim(),
           },
@@ -109,7 +114,8 @@ const CheckoutPage = () => {
         })
       );
 
-      await Promise.all(requests);
+      const responses = await Promise.all(requests);
+      console.log("Comenzi trimise cu succes!", responses);
       clearCart();
       setSuccess(true);
     } catch {
