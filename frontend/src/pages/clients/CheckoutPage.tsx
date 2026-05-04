@@ -71,6 +71,8 @@ const CheckoutPage = () => {
     }
 
     const clientId = getClientIdFromJwt();
+    console.log(clientId);
+    console.log(getClientIdFromJwt());
     if (!clientId) {
       setError('You must be logged in to place an order.');
       return;

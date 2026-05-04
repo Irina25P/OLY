@@ -20,6 +20,7 @@ import SellerOrdersPage from "../pages/seller/SellerOrdersPage"
 import SellerAnalyticsPage from "../pages/seller/SellerAnalyticsPage"
 import SellerReviewsPage from "../pages/seller/SellerReviewsPage"
 import SellerSettingsPage from "../pages/seller/SellerSettingsPage"
+import OrderTracking from "../pages/clients/OrderTracking.tsx";
 
 function AppRouter() {
     return (
@@ -47,6 +48,15 @@ function AppRouter() {
                         element={
                             <ProtectedRoute allowedRoles={["CLIENT"]}>
                                 <ClientProfile />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/orders"
+                        element={
+                            <ProtectedRoute allowedRoles={["CLIENT"]}>
+                                <OrderTracking />
                             </ProtectedRoute>
                         }
                     />
