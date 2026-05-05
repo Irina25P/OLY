@@ -35,6 +35,8 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const MINIO_BASE = "http://92.5.49.167:9000/disi-images";
+  const PLACEHOLDER = "https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&w=900&q=80";
 
   const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -44,6 +46,12 @@ const CheckoutPage = () => {
       setShipping((prev) => ({ ...prev, [name]: value }));
     }
   };
+
+    const getImageUrl = (url: string | undefined) => {
+        if (!url) return PLACEHOLDER;
+        if (url.startsWith("http")) return url;
+        return `${MINIO_BASE}/${url}`;
+    };
 
   const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -185,12 +193,14 @@ const CheckoutPage = () => {
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 p-4">
                     <div className="w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
-                      <img
-                        src={item.imageUrls[0]}
-                        alt={item.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
-                      />
+                        <img
+                            src={getImageUrl(item.imageUrls?.[0])}
+                            alt={item.title}
+                            onError={(e) => {
+                                (e.currentTarget.src = PLACEHOLDER);
+                            }}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 truncate text-sm">{item.title}</p>
