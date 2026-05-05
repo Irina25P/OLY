@@ -33,7 +33,7 @@ const ClientTopBar = () => {
 
       {/* Middle: DYNAMIC LINKS */}
       <nav className="flex gap-8 mx-8">
-        <Link to="/products" className={getLinkClass('/')}>Products</Link>
+        <Link to="/products" className={getLinkClass('/') && getLinkClass('/products')}>Products</Link>
         <Link to="/orders" className={getLinkClass('/orders')}>Orders</Link>
         <Link to="/profile" className={getLinkClass('/profile')}>Profile</Link>
       </nav>

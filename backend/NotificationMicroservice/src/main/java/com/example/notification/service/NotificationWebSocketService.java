@@ -32,8 +32,10 @@ public class NotificationWebSocketService {
         user.getNotifications().add(notification);
         userRepository.save(user);
 
+        notificationDto.setId(notification.getId());
+
         String destination = "/topic/user/" + user.getId() + topic.getDestinationPath();
-        messagingTemplate.convertAndSend(destination, notification);
+        messagingTemplate.convertAndSend(destination, notificationDto);
     }
 }
 

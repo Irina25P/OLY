@@ -13,6 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationDto {
+    private UUID id;
+
     @NotNull(message = "receiver id cannot be null")
     private UUID receiverId;
 
