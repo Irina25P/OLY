@@ -1,6 +1,6 @@
 package com.example.notification.dto.mapper;
 
-import com.example.notification.dto.NotificationDto;
+import com.example.notification.dto.*;
 import com.example.notification.model.Notification;
 
 public class NotificationMapper {
