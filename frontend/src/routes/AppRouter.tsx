@@ -69,6 +69,8 @@ function AppRouter() {
                             </ProtectedRoute>
                         }
                     />
+
+
                 </Route>
 
                 <Route

@@ -1,6 +1,6 @@
 import type { PaymentMethod } from "../CheckoutModels.tsx";
 
-export type OrderStatus = "PLACED" | "SHIPPED" | "IN_DELIVERY" | "CANCELLED" | "RECEIVED" | "DELIVERED";
+export type OrderStatus = "PLACED" | "SHIPPED" | "IN_DELIVERY" | "CANCELLED" | "RECEIVED";
 
 export interface OrderDto {
     id: string;
