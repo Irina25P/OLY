@@ -98,7 +98,11 @@ const OrderTracking: React.FC = () => {
                 );
 
                 setProductsCache(cache);
-                setOrders(orderRes.data);
+                const reversedOrders = [...orderRes.data].reverse();
+                setOrders(reversedOrders);
+                if (reversedOrders.length > 0) {
+                    await handleSelect(reversedOrders[0].id);
+                }
 
                 if (orderRes.data.length > 0) {
                     await handleSelect(orderRes.data[0].id);

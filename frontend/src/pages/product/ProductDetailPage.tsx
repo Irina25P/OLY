@@ -226,7 +226,12 @@ function ProductDetailPage() {
                 console.log("--- DATE DUPĂ MAPARE (FRONTEND) ---");
                 console.table(mappedReviews);
 
-                setReviews(mappedReviews);
+                const sortedReviews = mappedReviews.sort(
+                    (a, b) =>
+                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+
+                setReviews(sortedReviews);
 
                 if (currentUserId) {
                     const alreadyDidIt = res.data.some(rev => rev.clientId === currentUserId);
