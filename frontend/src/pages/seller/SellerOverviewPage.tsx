@@ -1,4 +1,5 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -31,37 +32,13 @@ const STATUS_COLORS: Record<string, string> = {
     RECEIVED:    "bg-[#D1FAE5] text-[#065F46]",
 };
 
-type Period = "week" | "month" | "months";
-
-function getChartLabels(period: Period) {
+function getWeekLabels(): string[] {
+    const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     const today = new Date();
-
-    if (period === "week") {
-        const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-        return Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(today);
-            d.setDate(today.getDate() - (6 - i));
-            return dayNames[d.getDay()];
-        });
-    }
-
-    if (period === "month") {
-        const weeks: string[] = [];
-        const d = new Date(today.getFullYear(), today.getMonth(), 1);
-        let n = 1;
-        while (d.getMonth() === today.getMonth()) {
-            weeks.push(`WEEK ${n}`);
-            d.setDate(d.getDate() + 7);
-            n++;
-        }
-        return weeks;
-    }
-
-    const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-    return Array.from({ length: 3 }, (_, i) => {
+    return Array.from({ length: 7 }, (_, i) => {
         const d = new Date(today);
-        d.setMonth(today.getMonth() - (2 - i));
-        return monthNames[d.getMonth()];
+        d.setDate(today.getDate() - (6 - i));
+        return dayNames[d.getDay()];
     });
 }
 
@@ -73,9 +50,8 @@ function SellerOverviewPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders]     = useState<Order[]>([]);
     const [loading, setLoading]   = useState(true);
-    const [period, setPeriod]     = useState<Period>("week");
 
-    const labels = useMemo(() => getChartLabels(period), [period]);
+    const labels = useMemo(() => getWeekLabels(), []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,7 +62,8 @@ function SellerOverviewPage() {
                     axiosInstance.get<Order[]>("/v1/orders/seller", { headers: authHeader }),
                 ]);
                 setProducts(prodRes.data.filter((p) => p.sellerId === user?.userId));
-                setOrders(orderRes.data);
+                // most recent first
+                setOrders([...orderRes.data].reverse());
             } catch {
                 // leave empty
             } finally {
@@ -96,12 +73,28 @@ function SellerOverviewPage() {
         fetchData();
     }, []);
 
-    const totalRevenue   = orders.reduce((sum, o) => sum + (o.fullPrice ?? 0), 0);
+    // Revenue only from RECEIVED orders
+    const receivedOrders = orders.filter((o) => o.statusType === "RECEIVED");
+    const totalRevenue   = receivedOrders.reduce((sum, o) => sum + (o.fullPrice ?? 0), 0);
     const pendingOrders  = orders.filter((o) => o.statusType === "PLACED").length;
     const recentOrders   = orders.slice(0, 5);
 
-    const maxBarOrders   = labels.length;
-    const barHeights     = labels.map((_, i) => 60 + (i / Math.max(maxBarOrders - 1, 1)) * 260);
+    // Chart: map the last 7 RECEIVED orders onto the 7-day columns.
+    // Most recent RECEIVED order → rightmost bar (today), older ones shift left.
+    const chartValues = useMemo(() => {
+        const values = Array(7).fill(0) as number[];
+        receivedOrders.slice(0, 7).forEach((order, i) => {
+            values[6 - i] = order.fullPrice ?? 0;
+        });
+        return values;
+    }, [orders]);
+
+    const maxValue = Math.max(...chartValues, 1);
+    const MIN_BAR  = 20; // px minimum so zero-value bars are still visible as a baseline
+    const MAX_BAR  = 280;
+    const barHeights = chartValues.map((v) =>
+        v === 0 ? MIN_BAR : MIN_BAR + (v / maxValue) * (MAX_BAR - MIN_BAR)
+    );
 
     return (
         <div>
@@ -129,7 +122,7 @@ function SellerOverviewPage() {
                         <h2 className="mt-8 text-4xl font-extrabold text-black">
                             {loading ? "—" : `$${totalRevenue.toFixed(2)}`}
                         </h2>
-                        <p className="mt-4 text-sm text-gray-600">Across all orders</p>
+                        <p className="mt-4 text-sm text-gray-600">From completed orders</p>
                     </div>
 
                     <div className="rounded-3xl bg-white p-7 shadow-sm">
@@ -157,27 +150,27 @@ function SellerOverviewPage() {
                         <div>
                             <h2 className="text-2xl font-bold">Sales Rhythm</h2>
                             <p className="mt-1 text-sm text-gray-600">
-                                Visualizing your sales performance by selected period.
+                                Revenue from completed orders — this week.
                             </p>
                         </div>
 
-                        <select
-                            value={period}
-                            onChange={(e) => setPeriod(e.target.value as Period)}
-                            className="!h-10 !w-fit !rounded-full !border !border-gray-200 !bg-white !px-4 !py-0 !text-sm !font-semibold !shadow-sm focus:!shadow-none"
-                        >
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                            <option value="months">Last 3 Months</option>
-                        </select>
+                        <span className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm">
+                            This Week
+                        </span>
                     </div>
 
                     <div className="mt-10 flex h-[360px] items-end justify-between border-t border-gray-200 pt-8">
                         {labels.map((label, i) => (
                             <div key={label} className="flex flex-col items-center gap-4">
+                                <span className="text-xs font-semibold text-gray-500">
+                                    {chartValues[i] > 0 ? `$${chartValues[i].toFixed(0)}` : ""}
+                                </span>
                                 <div
-                                    className="w-12 rounded-t-2xl"
-                                    style={{ height: `${barHeights[i]}px`, backgroundColor: "#9BA2FF" }}
+                                    className="w-12 rounded-t-2xl transition-all duration-500"
+                                    style={{
+                                        height: `${barHeights[i]}px`,
+                                        backgroundColor: chartValues[i] > 0 ? "#9BA2FF" : "#E5E7EB",
+                                    }}
                                 />
                                 <span className="text-xs font-semibold text-gray-500">{label}</span>
                             </div>
