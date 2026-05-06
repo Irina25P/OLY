@@ -32,6 +32,12 @@ public class ProductController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<List<ProductResponseDto>> getAllProductsForAdmin() {
+        return ResponseEntity.ok(productService.getAllProducts(null, null, null, null, null));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable UUID id) {
         return ResponseEntity.ok(productService.getProductById(id));
