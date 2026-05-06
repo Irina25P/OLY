@@ -6,7 +6,7 @@ import {
     Search,
     ShoppingCart,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axiosInstance from "../../services/axios";
 import { useCart } from "../../contexts/CartContext";
 import type { InterestType } from "../../models/InterestType";
@@ -34,12 +34,12 @@ const ALL_CATEGORIES: string[] = [
 ];
 
 const CATEGORY_LABEL: Record<string, string> = {
-    ELECTRONICS_IT:      "Electronics",
+    ELECTRONICS_IT: "Electronics",
     FASHION_ACCESSORIES: "Fashion",
-    HOME_GARDEN:         "Home",
-    AUTO_MOTO:           "Auto & Moto",
-    SPORTS_OUTDOOR:      "Sports",
-    GAMES_GAMING:        "Games",
+    HOME_GARDEN: "Home",
+    AUTO_MOTO: "Auto & Moto",
+    SPORTS_OUTDOOR: "Sports",
+    GAMES_GAMING: "Games",
 };
 
 const PLACEHOLDER =
@@ -72,16 +72,21 @@ type SortOption = "recommended" | "price-asc" | "price-desc";
 
 const SORT_LABELS: Record<SortOption, string> = {
     "recommended": "Recommended",
-    "price-asc":   "Price: Low to High",
-    "price-desc":  "Price: High to Low",
+    "price-asc": "Price: Low to High",
+    "price-desc": "Price: High to Low",
 };
 
 function ProductCatalogPage() {
+    const [searchParams] = useSearchParams();
+
     const [products, setProducts] = useState<ApiProduct[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+        const categoryParam = searchParams.get("category");
+        return categoryParam ? [categoryParam] : [];
+    });
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const [ratingFilter, setRatingFilter] = useState<number | null>(null);
@@ -122,7 +127,7 @@ function ProductCatalogPage() {
         };
 
         fetchProducts();
-    }, [debouncedSearch, selectedCategories, minPrice, maxPrice, ratingFilter]);
+    }, [searchParams, debouncedSearch, selectedCategories, minPrice, maxPrice, ratingFilter]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
