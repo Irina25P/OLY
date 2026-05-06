@@ -20,10 +20,18 @@ function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      await login(username, password);
-      const stored = localStorage.getItem("token");
-      const role = stored ? jwtDecode<{ role: string }>(stored).role : null;
-      navigate(role === "SELLER" ? "/seller" : "/products");
+        await login(username, password);
+
+        const stored = localStorage.getItem("token");
+        const role = stored ? jwtDecode<{ role: string }>(stored).role : null;
+
+        if (role === "ADMIN") {
+            navigate("/adminDashboard");
+        } else if (role === "SELLER") {
+            navigate("/seller");
+        } else {
+            navigate("/products");
+        }
     } catch {
       setError("Invalid credentials. Please try again.");
     } finally {

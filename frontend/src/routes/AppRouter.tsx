@@ -21,6 +21,7 @@ import SellerAnalyticsPage from "../pages/seller/SellerAnalyticsPage"
 import SellerReviewsPage from "../pages/seller/SellerReviewsPage"
 import SellerSettingsPage from "../pages/seller/SellerSettingsPage"
 import OrderTracking from "../pages/clients/OrderTracking.tsx";
+import PlatformOverview from "../pages/admin/PlatformOverview.tsx";
 
 function AppRouter() {
     return (
@@ -66,6 +67,15 @@ function AppRouter() {
                         element={
                             <ProtectedRoute>
                                 <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/adminDashboard"
+                        element={
+                            <ProtectedRoute allowedRoles={["ADMIN"]}>
+                                <PlatformOverview />
                             </ProtectedRoute>
                         }
                     />
