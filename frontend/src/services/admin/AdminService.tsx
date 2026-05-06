@@ -1,13 +1,62 @@
 import axiosInstance from "../../services/axios";
 
-// --- INTERFEȚE ---
+export interface AdminSellerDto {
+    id: string;
+    name: string;
+    username: string;
+    email: string;
+    imageName: string;
+    description: string;
+    county: string;
+}
+
+export interface AdminClientDto {
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    county: string;
+    age: number;
+    phoneNumber: string;
+    interests: string[];
+}
+
+export interface AdminOrderDto {
+    id: string;
+    clientId: string;
+    sellerId: string;
+    statusType: "PLACED" | "SHIPPED" | "IN_DELIVERY" | "RECEIVED" | "CANCELLED";
+    payment: string;
+    county: string;
+    city: string;
+    street: string;
+    fullPrice: number;
+    createdAt: string;
+}
+
+export interface ProductDto {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    imageUrls: string[];
+    category: string;
+    averageRating: number | null;
+    sellerId: string;
+}
+
 export interface Seller {
     id: string;
     name: string;
+    username: string;
     email: string;
     imageUrl: string;
     totalRevenue: number;
+    totalSales: number;
     rating: number;
+    status: "Active" | "Inactive";
 }
 
 export interface RevenueDataPoint {
@@ -15,87 +64,199 @@ export interface RevenueDataPoint {
     amount: number;
 }
 
-export interface CategoryDistribution {
-    category: string;
-    count: number;
+export interface SellerRevenueDataPoint {
+    sellerName: string;
     revenue: number;
 }
 
-// --- SERVICIUL ---
+export interface AdminSummary {
+    totalSellers: number;
+    totalClients: number;
+    totalOrders: number;
+    finishedOrders: number;
+    totalRevenue: number;
+}
+
+const MINIO_BASE = "http://92.5.49.167:9000/disi-images";
+
+const isInLastDays = (date: string, days: number) => {
+    const createdAt = new Date(date);
+    const now = new Date();
+
+    const limit = new Date();
+    limit.setDate(now.getDate() - days);
+
+    return createdAt >= limit && createdAt <= now;
+};
+
+const getFinishedOrders = (orders: AdminOrderDto[], days?: number) => {
+    return orders.filter((order) => {
+        const isFinished = order.statusType === "RECEIVED";
+        const isInPeriod = days ? isInLastDays(order.createdAt, days) : true;
+
+        return isFinished && isInPeriod;
+    });
+};
+
 export const AdminService = {
-    /**
-     * Extrage toți sellerii unici din produsele existente.
-     * Folosește endpoint-ul real: /v1/products/search
-     */
     async getAllSellers(): Promise<Seller[]> {
         try {
-            const response = await axiosInstance.get<any[]>("/v1/products/search");
-            const products = response.data;
+            const [sellersResponse, ordersResponse, productsResponse] =
+                await Promise.all([
+                    axiosInstance.get<AdminSellerDto[]>("/v1/users/admin/sellers"),
+                    axiosInstance.get<AdminOrderDto[]>("/v1/orders/all"),
+                    axiosInstance.get<ProductDto[]>("/v1/products/search"),
+                ]);
 
-            // Extragem ID-uri unice de selleri
-            const uniqueSellerIds = Array.from(new Set(products.map((p) => p.sellerId)));
+            const sellers = sellersResponse.data;
+            const orders = getFinishedOrders(ordersResponse.data);
+            const products = productsResponse.data;
 
-            return uniqueSellerIds.map((id) => ({
-                id: id,
-                name: `Seller ${id.slice(0, 5).toUpperCase()}`,
-                email: "contact@platform.com",
-                imageUrl: "", // Aici se poate completa ulterior cu date din UserMicroservice
-                totalRevenue: products
-                    .filter((p) => p.sellerId === id)
-                    .reduce((sum, p) => sum + (p.price * 5), 0), // Simulare venit per seller
-                rating: 4.5
-            }));
+            return sellers.map((seller) => {
+                const sellerOrders = orders.filter(
+                    (order) => order.sellerId === seller.id
+                );
+
+                const sellerProducts = products.filter(
+                    (product) => product.sellerId === seller.id
+                );
+
+                const totalRevenue = sellerOrders.reduce(
+                    (sum, order) => sum + (order.fullPrice ?? 0),
+                    0
+                );
+
+                const validRatings = sellerProducts
+                    .map((product) => product.averageRating)
+                    .filter((rating): rating is number => rating !== null);
+
+                const rating =
+                    validRatings.length > 0
+                        ? validRatings.reduce((sum, value) => sum + value, 0) /
+                        validRatings.length
+                        : 0;
+
+                return {
+                    id: seller.id,
+                    name: seller.name,
+                    username: seller.username,
+                    email: seller.email,
+                    imageUrl: seller.imageName
+                        ? `${MINIO_BASE}/${seller.imageName}`
+                        : "",
+                    totalRevenue,
+                    totalSales: sellerOrders.length,
+                    rating,
+                    status: sellerOrders.length > 0 ? "Active" : "Inactive",
+                };
+            });
         } catch (error) {
-            console.error("Error fetching sellers from products:", error);
+            console.error("Error fetching admin sellers:", error);
             return [];
         }
     },
 
-    /**
-     * Calculează veniturile.
-     * Am prefixat days cu '_' pentru a evita eroarea TS6133 (unused variable).
-     */
-    async getRevenueAnalytics(_days: number): Promise<RevenueDataPoint[]> {
+    async getRevenueAnalytics(days: number): Promise<RevenueDataPoint[]> {
         try {
-            // Momentan returnăm un array gol pentru a evita 404 pe rutele inexistente de admin.
-            // Când adaugi în Backend rutele de admin, vei decomenta linia de mai jos:
-            // const response = await axiosInstance.get("/v1/orders/all", { params: { lastDays: _days } });
+            const response = await axiosInstance.get<AdminOrderDto[]>("/v1/orders/all");
 
-            return [
-                { date: "2024-05-01", amount: 400 },
-                { date: "2024-05-02", amount: 700 }
-            ]; // Date simulate pentru a vedea graficul în UI
-        } catch (error) {
-            console.error("Error fetching revenue stats:", error);
-            return [];
-        }
-    },
+            const orders = getFinishedOrders(response.data, days);
 
-    /**
-     * Grupează produsele pe categorii folosind datele din ProductMicroservice.
-     */
-    async getCategoryStats(): Promise<CategoryDistribution[]> {
-        try {
-            const response = await axiosInstance.get<any[]>("/v1/products/search");
-            const products = response.data;
+            const groupedByDate: Record<string, number> = {};
 
-            const stats: Record<string, { count: number; rev: number }> = {};
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
 
-            products.forEach((p) => {
-                const cat = p.category || "General";
-                if (!stats[cat]) stats[cat] = { count: 0, rev: 0 };
-                stats[cat].count++;
-                stats[cat].rev += (p.price * p.stock); // Calculăm valoarea potențială a stocului
+                const key = date.toISOString().split("T")[0];
+                groupedByDate[key] = 0;
+            }
+
+            orders.forEach((order) => {
+                const date = new Date(order.createdAt).toISOString().split("T")[0];
+
+                if (groupedByDate[date] !== undefined) {
+                    groupedByDate[date] += order.fullPrice ?? 0;
+                }
             });
 
-            return Object.entries(stats).map(([category, data]) => ({
-                category,
-                count: data.count,
-                revenue: data.rev
+            return Object.entries(groupedByDate).map(([date, amount]) => ({
+                date,
+                amount,
             }));
         } catch (error) {
-            console.error("Error fetching category stats:", error);
+            console.error("Error fetching revenue analytics:", error);
             return [];
         }
-    }
+    },
+
+    async getRevenuePerSeller(days: number): Promise<SellerRevenueDataPoint[]> {
+        try {
+            const [sellersResponse, ordersResponse] = await Promise.all([
+                axiosInstance.get<AdminSellerDto[]>("/v1/users/admin/sellers"),
+                axiosInstance.get<AdminOrderDto[]>("/v1/orders/all"),
+            ]);
+
+            const sellers = sellersResponse.data;
+            const orders = getFinishedOrders(ordersResponse.data, days);
+
+            return sellers
+                .map((seller) => {
+                    const sellerOrders = orders.filter(
+                        (order) => order.sellerId === seller.id
+                    );
+
+                    const revenue = sellerOrders.reduce(
+                        (sum, order) => sum + (order.fullPrice ?? 0),
+                        0
+                    );
+
+                    return {
+                        sellerName: seller.name,
+                        revenue,
+                    };
+                })
+                .filter((item) => item.revenue > 0)
+                .sort((a, b) => b.revenue - a.revenue);
+        } catch (error) {
+            console.error("Error fetching revenue per seller:", error);
+            return [];
+        }
+    },
+
+    async getSummary(): Promise<AdminSummary> {
+        try {
+            const [sellersResponse, clientsResponse, ordersResponse] =
+                await Promise.all([
+                    axiosInstance.get<AdminSellerDto[]>("/v1/users/admin/sellers"),
+                    axiosInstance.get<AdminClientDto[]>("/v1/users/admin/clients"),
+                    axiosInstance.get<AdminOrderDto[]>("/v1/orders/all"),
+                ]);
+
+            const finishedOrders = getFinishedOrders(ordersResponse.data);
+
+            return {
+                totalSellers: sellersResponse.data.length,
+                totalClients: clientsResponse.data.length,
+                totalOrders: ordersResponse.data.length,
+                finishedOrders: finishedOrders.length,
+                totalRevenue: finishedOrders.reduce(
+                    (sum, order) => sum + (order.fullPrice ?? 0),
+                    0
+                ),
+            };
+        } catch (error) {
+            console.error("Error fetching admin summary:", error);
+
+            return {
+                totalSellers: 0,
+                totalClients: 0,
+                totalOrders: 0,
+                finishedOrders: 0,
+                totalRevenue: 0,
+            };
+        }
+    },
 };
+
+export default AdminService;
