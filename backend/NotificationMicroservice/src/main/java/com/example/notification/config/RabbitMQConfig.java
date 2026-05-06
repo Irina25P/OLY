@@ -4,9 +4,6 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
-import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +18,13 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.sync.exhange.notification.topic}")
     private String notificationTopicExchange;
 
+    @Value("${rabbitmq.sync.exchange.user.topic}")
+    private String userTopicExchange;
+
+    /**
+     * notifications routing keys
+     */
+
     @Value("${rabbitmq.sync.routingkey.orderCreated}")
     private String orderCreatedRoutingKey;
 
@@ -29,6 +33,19 @@ public class RabbitMQConfig {
 
     @Value("${rabbitmq.sync.routingkey.reviewCreated}")
     private String reviewCreatedRoutingKey;
+
+    /**
+     * user sync routing keys
+     */
+
+    @Value("${rabbitmq.sync.routingkey.client}")
+    private String addClientRoutingKey;
+
+    @Value("${rabbitmq.sync.routingkey.seller}")
+    private String addSellerRoutingKey;
+
+    @Value("${rabbitmq.sync.routingkey.deleteUser}")
+    private String deleteUserRoutingKey;
 
     @Bean
     public TopicExchange notificationTopicExchange() {
@@ -72,18 +89,44 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public JacksonJsonMessageConverter jackson2JsonMessageConverter() {
-        return new JacksonJsonMessageConverter();
+    public TopicExchange userTopicExchange() {
+        return new TopicExchange(userTopicExchange, true, false);
     }
 
     @Bean
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
-            ConnectionFactory connectionFactory,
-            JacksonJsonMessageConverter jackson2JsonMessageConverter
-    ) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(jackson2JsonMessageConverter);
-        return factory;
+    public Queue addClientQueue() {
+        return new Queue(userTopicExchange + "." + uniqueQueueName + "." + addClientRoutingKey, true, false, false);
+    }
+
+    @Bean
+    public Binding addClientBinding() {
+        return BindingBuilder.bind(addClientQueue())
+                .to(userTopicExchange())
+                .with(addClientRoutingKey);
+    }
+
+    @Bean
+    public Queue addSellerQueue() {
+        return new Queue(userTopicExchange + "." + uniqueQueueName + "." + addSellerRoutingKey, true, false, false);
+    }
+
+    @Bean
+    public Binding addSellerBinding() {
+        System.out.println(userTopicExchange + "." + uniqueQueueName + "." + addSellerRoutingKey);
+        return BindingBuilder.bind(addSellerQueue())
+                .to(userTopicExchange())
+                .with(addSellerRoutingKey);
+    }
+
+    @Bean
+    public Queue deleteUserQueue() {
+        return new Queue(userTopicExchange + "." + uniqueQueueName + "." + deleteUserRoutingKey, true, false, false);
+    }
+
+    @Bean
+    public Binding deleteUserBinding() {
+        return BindingBuilder.bind(deleteUserQueue())
+                .to(userTopicExchange())
+                .with(deleteUserRoutingKey);
     }
 }

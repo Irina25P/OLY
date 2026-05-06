@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import logo from '../../assets/logo.png';
 import { ShoppingBag, Bell, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const MINIO_BASE = "http://92.5.49.167:9000/disi-images";
 const PLACEHOLDER = "https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&w=900&q=80";
@@ -10,8 +11,7 @@ const ClientTopBar = () => {
     const { totalItems, cartItems, totalPrice, removeFromCart } = useCart();
     const location = useLocation();
 
-    const isLoggedIn = false;
-    const user = { name: "Sarah" };
+    const { user, isAuthenticated, logout } = useAuth();
 
     // Funcția care decide URL-ul corect pentru imagine
     const getImageUrl = (url: string | undefined) => {
@@ -25,22 +25,16 @@ const ClientTopBar = () => {
         return `pb-1 transition-all duration-200 ease-in-out border-b-2 ${isActive
             ? 'font-bold text-[#54457f] border-[#54457f]'
             : 'font-normal text-gray-600 border-transparent hover:text-[#54457f]'
-        }`;
+            }`;
     };
 
     return (
         <header className="flex items-center justify-between p-4 border-b border-gray-300 bg-white">
 
-            {/* Left Side: Logo & Search */}
-            <div className="flex items-center gap-8">
+            {/* Left Side: Logo */}
+            <Link className="flex items-center gap-8" to="/">
                 <img src={logo} alt="Logo" className="h-[48px] w-auto object-contain" />
-
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="outline-none" // Adăugat opțional pentru curățenie
-                />
-            </div>
+            </Link>
 
             {/* Middle: DYNAMIC LINKS */}
             <nav className="flex gap-8 mx-8">
@@ -59,8 +53,8 @@ const ClientTopBar = () => {
                         <ShoppingBag size={24} strokeWidth={2.5} />
                         {totalItems > 0 && (
                             <span className="absolute -top-0.5 -right-2 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-700 text-white rounded-full text-[10px] font-bold border-2 border-white">
-                {totalItems}
-              </span>
+                                {totalItems}
+                            </span>
                         )}
                     </Link>
 
@@ -93,7 +87,7 @@ const ClientTopBar = () => {
                                                 {item.title}
                                             </p>
                                             <p className="text-[10px] text-gray-500 m-0">
-                                                {item.quantity} x {item.price} RON
+                                                {item.quantity} x {item.price} $
                                             </p>
                                         </div>
 
@@ -119,7 +113,7 @@ const ClientTopBar = () => {
                             <div className="p-4 bg-gray-50 border-t border-gray-100">
                                 <div className="flex justify-between mb-3 text-sm font-bold">
                                     <span>Total:</span>
-                                    <span className="text-[#54457f]">{totalPrice} RON</span>
+                                    <span className="text-[#54457f]">{totalPrice} $</span>
                                 </div>
                                 <Link
                                     to="/checkout"
@@ -137,15 +131,20 @@ const ClientTopBar = () => {
                     <Bell size={24} strokeWidth={2.5} />
                 </button>
 
-                {isLoggedIn ? (
+                {isAuthenticated ? (
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-700">Hi, {user.name}</span>
-                        <button className="text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium">Logout</button>
+                        <span className="text-gray-700">Hi, {user?.username}</span>
+                        <button
+                            onClick={logout}
+                            className="px-4 py-2 rounded-lg font-semibold !text-[#54457f] hover:!bg-[#9BA2FF] hover:!text-white transition-all"
+                        >
+                            Logout
+                        </button>
                     </div>
                 ) : (
                     <Link
                         to="/login"
-                        className="px-4 py-2 rounded-lg font-semibold text-[#54457f] hover:bg-[#9BA2FF] hover:text-white transition-all"
+                        className="px-4 py-2 rounded-lg font-semibold !text-[#54457f] hover:!bg-[#9BA2FF] hover:!text-white transition-all"
                     >
                         Sign In
                     </Link>

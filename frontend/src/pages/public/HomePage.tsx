@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/axios";
+import { useAuth } from "../../context/AuthContext";
 
 interface ApiProduct {
   id: string;
@@ -30,6 +31,7 @@ type CategoryCardProps = {
   className?: string;
   backgroundClassName?: string;
   image?: string;
+  onClick?: () => void;
 };
 
 function CategoryCard({
@@ -38,10 +40,12 @@ function CategoryCard({
   className = "",
   backgroundClassName = "bg-[#F3F3F3]",
   image,
+  onClick,
 }: CategoryCardProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl ${backgroundClassName} ${className}`}
+      onClick={onClick}
+      className={`relative cursor-pointer overflow-hidden rounded-2xl transition hover:shadow-lg ${backgroundClassName} ${className}`}
     >
       {image && (
         <img
@@ -116,6 +120,8 @@ function HomePage() {
   const [page, setPage] = useState(0);
   const PAGE_SIZE = 4;
 
+  const { isAuthenticated } = useAuth();
+
   useEffect(() => {
     axiosInstance
       .get<ApiProduct[]>("/v1/products/search?categories=ELECTRONICS_IT")
@@ -145,16 +151,18 @@ function HomePage() {
             <div className="mt-10 flex items-center gap-4">
               <Link
                 to="/products"
-                className="rounded-xl bg-[#54457F] px-8 py-3 text-sm font-semibold text-[#FFFFFF] shadow-[0_8px_16px_rgba(84,69,127,0.18)] transition hover:opacity-90"
+                className="rounded-xl !bg-[#54457F] px-8 py-3 text-sm font-semibold !text-[#FFFFFF] shadow-[0_8px_16px_rgba(84,69,127,0.18)] transition hover:opacity-90"
               >
                 Browse Products
               </Link>
+              { !isAuthenticated && (
               <Link
                 to="/register"
-                className="rounded-xl border border-[#54457F] bg-[#FFFFFF] px-8 py-3 text-sm font-semibold text-[#54457F] transition hover:bg-[#F5F2FB]"
+                className="rounded-xl border border-[#54457F] !bg-[#FFFFFF] px-8 py-3 text-sm font-semibold !text-[#54457F] transition hover:!bg-[#F5F2FB]"
               >
                 Sign Up
               </Link>
+              )}
             </div>
           </div>
         </section>
@@ -166,7 +174,7 @@ function HomePage() {
             </h2>
             <Link
               to="/categories"
-              className="text-sm font-medium text-[#54457F] transition hover:opacity-80"
+              className="text-sm font-medium !text-[#54457F] transition hover:opacity-80"
             >
               View all categories
             </Link>
@@ -179,6 +187,7 @@ function HomePage() {
               className="col-span-6 h-[240px]"
               backgroundClassName="bg-gradient-to-r from-[#8F959B] via-[#D6D8DB] to-[#8E969D]"
               image="https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=1200&q=80"
+              onClick={() => navigate(`/products?category=ELECTRONICS_IT`)}
             />
 
             <CategoryCard
@@ -186,6 +195,7 @@ function HomePage() {
               className="col-span-3 h-[240px]"
               backgroundClassName="bg-gradient-to-br from-[#F9A3A7] to-[#E85D75]"
               image="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80"
+              onClick={() => navigate(`/products?category=FASHION_ACCESSORIES`)}
             />
 
             <CategoryCard
@@ -193,6 +203,7 @@ function HomePage() {
               className="col-span-3 h-[240px]"
               backgroundClassName="bg-gradient-to-br from-[#ECECEC] to-[#CFCFCF]"
               image="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=900&q=80"
+              onClick={() => navigate(`/products?category=HOME_GARDEN`)}
             />
 
             <div className="col-span-12 rounded-2xl bg-[#D6C9F2] px-10 py-10">

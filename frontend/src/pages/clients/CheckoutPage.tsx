@@ -207,7 +207,7 @@ const CheckoutPage = () => {
                       <p className="text-xs text-gray-500 mt-0.5">Qty: {item.quantity}</p>
                     </div>
                     <p className="font-bold text-[#54457f] text-sm whitespace-nowrap">
-                      {(item.price * item.quantity).toFixed(2)} RON
+                      {(item.price * item.quantity).toFixed(2)} $
                     </p>
                   </div>
                 ))}
@@ -390,13 +390,13 @@ const CheckoutPage = () => {
                       {item.title} <span className="text-gray-400">x{item.quantity}</span>
                     </span>
                     <span className="text-gray-900 font-medium whitespace-nowrap">
-                      {(item.price * item.quantity).toFixed(2)} RON
+                      {(item.price * item.quantity).toFixed(2)} $
                     </span>
                   </div>
                 ))}
                 <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-base">
                   <span>Total</span>
-                  <span className="text-[#54457f]">{totalPrice.toFixed(2)} RON</span>
+                  <span className="text-[#54457f]">{totalPrice.toFixed(2)} $</span>
                 </div>
               </div>
 

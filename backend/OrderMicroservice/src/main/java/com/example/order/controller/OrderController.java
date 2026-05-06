@@ -26,6 +26,13 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<List<OrderDto>> getAllOrders(){
+        List<OrderDto> orders = orderService.findAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/client")
     public ResponseEntity<List<OrderDto>> getByBuyerId(@RequestHeader(name = "${security.user-id-header}") String userId){

@@ -81,6 +81,18 @@ public class OrderService {
                 .toList();
     }
 
+    public List<OrderDto> findAllOrders(){
+        List<Order> orders = orderRepository.findAll();
+
+        return orders.stream()
+                .filter(Objects::nonNull)
+                .map(order -> {
+                    Double fullPrice = calculateOrderFullPrice(order.getId());
+                    return OrderMapper.toOrderDto(order, fullPrice);
+                })
+                .toList();
+    }
+
     private Double calculateOrderFullPrice(UUID orderId) {
         return orderProductsRepository.findAllByOrder_Id(orderId)
                 .stream()
@@ -112,6 +124,8 @@ public class OrderService {
             orderProductDto.setOrderId(order.getId());
             orderProductsRepository.save(OrderProductsMapper.toOrderProducts(orderProductDto));
         });
+
+        orderDto.setId(order.getId());
 
         try{
             String orderMessage = objectMapper.writeValueAsString(OrderNotificationMapper.toOrderNotificationDto(orderDto));
