@@ -94,6 +94,7 @@ public class ReviewService {
             ReviewDetailDTO reviewDetailDTO = ReviewDetailDTO.builder()
                     .id(review.getId())
                     .clientId(review.getUser().getId())
+                    .rating(review.getRating())
                     .createdAt(review.getCreatedAt())
                     .comment(review.getComment())
                     .sellerReply(replyDetailDTO).build();

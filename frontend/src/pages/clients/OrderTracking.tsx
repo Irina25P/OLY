@@ -7,7 +7,6 @@ import {
     CreditCard,
     Search,
     Check,
-    Inbox,
     Truck,
     Package,
     Home,
@@ -18,35 +17,31 @@ const MINIO_BASE = "http://92.5.49.167:9000/disi-images";
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
     PLACED: "bg-[#FEF3C7] text-[#B45309]",
-    RECEIVED: "bg-[#D1FAE5] text-[#065F46]",
     SHIPPED: "bg-indigo-50 text-[#54457F]",
     IN_DELIVERY: "bg-[#E0E7FF] text-[#4338CA]",
-    DELIVERED: "bg-orange-50 text-orange-700",
     CANCELLED: "bg-red-50 text-[#E85D75]",
+    RECEIVED: "bg-orange-50 text-orange-700",
 };
 
 const ORDER_STEPS: OrderStatus[] = [
     "PLACED",
-    "RECEIVED",
     "SHIPPED",
     "IN_DELIVERY",
-    "DELIVERED",
+    "RECEIVED",
 ];
 
 const STEP_LABELS: Record<string, string> = {
     PLACED: "Placed",
-    RECEIVED: "Received",
     SHIPPED: "Shipped",
     IN_DELIVERY: "In Delivery",
-    DELIVERED: "Delivered",
+    RECEIVED: "Received",
 };
 
 const STEP_ICONS: Record<string, React.ReactNode> = {
     PLACED: <Check size={18} />,
-    RECEIVED: <Inbox size={18} />,
     SHIPPED: <Truck size={18} />,
     IN_DELIVERY: <Package size={18} />,
-    DELIVERED: <Home size={18} />,
+    RECEIVED: <Home size={18} />,
 };
 
 const getShortId = (id: string) => `#ORD-${id.slice(0, 6).toUpperCase()}`;
@@ -103,7 +98,11 @@ const OrderTracking: React.FC = () => {
                 );
 
                 setProductsCache(cache);
-                setOrders(orderRes.data);
+                const reversedOrders = [...orderRes.data].reverse();
+                setOrders(reversedOrders);
+                if (reversedOrders.length > 0) {
+                    await handleSelect(reversedOrders[0].id);
+                }
 
                 if (orderRes.data.length > 0) {
                     await handleSelect(orderRes.data[0].id);
