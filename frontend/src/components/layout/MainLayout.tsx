@@ -8,7 +8,14 @@ function MainLayout() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-[#FFFFFF] text-[#000000]">
 
-      <Toaster position="top-right" />
+      <Toaster position="top-right"
+      toastOptions={{
+        className: '',
+        duration: 7000,
+      }}
+      containerStyle={{
+        top: 40,
+      }} />
       <WebSocketConnection />
 
       <ClientTopBar />

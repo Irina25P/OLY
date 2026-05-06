@@ -3,20 +3,25 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import type { NotificationDto, NotificationAckDto } from '../models/notification';
 import { showNotification } from '../components/layout/ToastNotification';
-import { getClientIdFromJwt } from '../validators/checkoutValidations';
-
+import { useAuth } from '../context/AuthContext'; // Importă hook-ul tău
 
 const WebSocketConnection: React.FC = () => {
     const clientRef = useRef<Client | null>(null);
-    const userId = getClientIdFromJwt();
+    const { user, isAuthenticated } = useAuth();
 
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws');
+        if (!isAuthenticated || !user?.userId) {
+            return;
+        }
+
+        const socket = new SockJS('http://localhost/ws', null, {
+            transports: ['websocket', 'xhr-streaming', 'xhr-polling']
+            });
         const stompClient = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,
             onConnect: () => {
-                console.log("Connected to WebSocket");
+                console.log("Connected to WebSocket for user:", user.userId);
 
                 const topics = [
                     { path: '/receivedOrder', title: 'New Order' },
@@ -25,24 +30,25 @@ const WebSocketConnection: React.FC = () => {
                 ];
 
                 topics.forEach((topic) => {
-                    const destination = `/topic/user/${userId}${topic.path}`;
-                    
+                    const destination = `/topic/user/${user.userId}${topic.path}`;
+
                     stompClient.subscribe(destination, (message) => {
-                        const data: NotificationDto = JSON.parse(message.body);
-                        
-                        showNotification(data.message, topic.title);
+                        try {
+                            const data: NotificationDto = JSON.parse(message.body);
+                            showNotification(data.message, topic.title);
 
-                        const ackPayload: NotificationAckDto = {
-                            notificationId: data.id,
-                            receiverId: userId || ''
-                        };
+                            const ackPayload: NotificationAckDto = {
+                                notificationId: data.id,
+                                receiverId: user.userId
+                            };
 
-                        stompClient.publish({
-                            destination: '/app/notification.ack',
-                            body: JSON.stringify(ackPayload)
-                        });
-                        
-                        console.log("ACK sent for:", data.id);
+                            stompClient.publish({
+                                destination: '/app/notification.ack',
+                                body: JSON.stringify(ackPayload)
+                            });
+                        } catch (err) {
+                            console.error("Error parsing message body", err);
+                        }
                     });
                 });
             },
@@ -56,10 +62,12 @@ const WebSocketConnection: React.FC = () => {
 
         return () => {
             if (clientRef.current) {
+                console.log("Deactivating WebSocket...");
                 clientRef.current.deactivate();
+                clientRef.current = null;
             }
         };
-    }, [userId]);
+    }, [user?.userId, isAuthenticated]);
 
     return null;
 };
