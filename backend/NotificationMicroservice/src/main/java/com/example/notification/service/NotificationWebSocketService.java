@@ -1,31 +1,39 @@
 package com.example.notification.service;
 
 import com.example.notification.dto.NotificationDto;
+import com.example.notification.dto.mapper.NotificationMapper;
+import com.example.notification.model.Notification;
+import com.example.notification.model.User;
+import com.example.notification.model.enums.Topic;
+import com.example.notification.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
 public class NotificationWebSocketService {
 
-    private static final String USER_NOTIFICATION_DESTINATION = "/queue/notifications";
-
+    private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public NotificationWebSocketService(SimpMessagingTemplate messagingTemplate) {
+    public NotificationWebSocketService(UserRepository userRepository, SimpMessagingTemplate messagingTemplate) {
+        this.userRepository = userRepository;
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendToUser(NotificationDto notificationDto) {
-        if (notificationDto == null || !StringUtils.hasText(notificationDto.getReceiverId())) {
-            return;
-        }
+    @Transactional
+    public void createAndSendNotification(NotificationDto notificationDto, Topic topic) {
+        User user = userRepository.findById(notificationDto.getReceiverId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        messagingTemplate.convertAndSendToUser(
-                notificationDto.getReceiverId(),
-                USER_NOTIFICATION_DESTINATION,
-                notificationDto
-        );
+        Notification notification = NotificationMapper.toNotification(notificationDto);
+        notification.setTopic(topic);
+
+        user.getNotifications().add(notification);
+        userRepository.save(user);
+
+        String destination = "/topic/user/" + user.getId() + topic.getDestinationPath();
+        messagingTemplate.convertAndSend(destination, notification);
     }
 }
 
