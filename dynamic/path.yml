@@ -1,5 +1,12 @@
 http:
   routers:
+    notifications-router:
+      rule: "PathPrefix(`/ws`)"
+      service: notifications-service
+      priority: 250
+      entryPoints:
+        - web
+
     cors-preflight-router:
       rule: "Method(`OPTIONS`)"
       entryPoints:
@@ -16,7 +23,7 @@ http:
       service: frontend
 
     users-api:
-      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/users`)" 
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/users`)"
       entryPoints:
         - web
       middlewares:
@@ -24,7 +31,7 @@ http:
         - jwt-auth-forwarder
         - strip-api-prefix
       service: user-service
-    
+
     image-management-api:
       rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/images`)"
       entryPoints:
@@ -74,7 +81,7 @@ http:
         - strip-api-prefix
       service: auth-service
 
-    
+
 
   middlewares:
     strip-api-prefix:
@@ -101,7 +108,7 @@ http:
     jwt-auth-forwarder:
       forwardAuth:
         address: "http://auth-service:8080/v1/auth/verify"
-        
+
         authResponseHeaders:
           - "Username-Header"
           - "Role-Header"
@@ -116,24 +123,29 @@ http:
     user-service:
       loadBalancer:
         servers:
-          - url: "http://user-service:8080" 
+          - url: "http://user-service:8080"
 
     image-management-service:
       loadBalancer:
         servers:
-          - url: "http://image-management-service:8080" 
+          - url: "http://image-management-service:8080"
 
     product-service:
       loadBalancer:
         servers:
-          - url: "http://product-service:8080" 
+          - url: "http://product-service:8080"
 
     order-service:
       loadBalancer:
         servers:
-          - url: "http://order-service:8080" 
+          - url: "http://order-service:8080"
 
     auth-service:
       loadBalancer:
         servers:
           - url: "http://auth-service:8080"
+
+    notifications-service:
+      loadBalancer:
+        servers:
+          - url: "http://notification-service:8080"

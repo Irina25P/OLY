@@ -11,6 +11,8 @@ import {
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext";
+import WebSocketConnection from "../../websocket/WebsocketConnection";
+import { Toaster } from "react-hot-toast";
 
 const navItems = [
     { label: "Dashboard", path: "/seller", icon: Grid2X2 },
@@ -32,6 +34,18 @@ function SellerLayout() {
 
     return (
         <div className="flex min-h-screen w-full bg-[#F8F8F8] text-[#000000]">
+
+            <Toaster position="top-right"
+                toastOptions={{
+                    className: '',
+                    duration: 7000,
+                }}
+                containerStyle={{
+                    top: 40,
+                }} />
+
+            <WebSocketConnection />
+
             <aside className="sticky top-0 flex h-screen w-[260px] shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-[#F4F7FB] px-6 py-6">
                 <div>
                     <img src={logo} alt="OLY logo" className="h-16 w-16 object-contain" />

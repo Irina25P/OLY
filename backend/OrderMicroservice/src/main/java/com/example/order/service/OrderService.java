@@ -113,6 +113,8 @@ public class OrderService {
             orderProductsRepository.save(OrderProductsMapper.toOrderProducts(orderProductDto));
         });
 
+        orderDto.setId(order.getId());
+
         try{
             String orderMessage = objectMapper.writeValueAsString(OrderNotificationMapper.toOrderNotificationDto(orderDto));
             rabbitTemplate.convertAndSend(syncExchangeNotificationTopic, routingKeyOrderCreated, orderMessage);
