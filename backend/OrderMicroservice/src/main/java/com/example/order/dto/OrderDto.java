@@ -6,6 +6,7 @@ import com.example.order.entities.enums.PaymentMethod;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
@@ -37,7 +38,9 @@ public class OrderDto {
 
     private Double fullPrice;
 
-    public OrderDto(UUID clientId, UUID sellerId, OrderStatus statusType, PaymentMethod payment, County county, String  city, String street) {
+    private Timestamp createdAt;
+
+    public OrderDto(UUID clientId, UUID sellerId, OrderStatus statusType, PaymentMethod payment, County county, String  city, String street, Timestamp createdAt) {
         this.clientId = clientId;
         this.sellerId = sellerId;
         this.statusType = statusType;
@@ -45,6 +48,7 @@ public class OrderDto {
         this.county = county;
         this.city = city;
         this.street = street;
+        this.createdAt = createdAt;
     }
 
     @Override
