@@ -7,6 +7,7 @@ import com.example.order.entities.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
@@ -45,4 +46,7 @@ public class Order {
 
     @Column(name = "street")
     private String street;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt;
 }

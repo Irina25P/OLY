@@ -4,6 +4,9 @@ import com.example.order.dto.OrderDto;
 import com.example.order.entities.Order;
 import com.example.order.entities.User;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+
 public class OrderMapper {
 
     public static Order toOrder(OrderDto orderDto) {
@@ -27,7 +30,8 @@ public class OrderMapper {
                 orderDto.getPayment(),
                 orderDto.getCounty(),
                 orderDto.getCity(),
-                orderDto.getStreet()
+                orderDto.getStreet(),
+                new Timestamp(System.currentTimeMillis())
         );
     }
 
@@ -40,7 +44,8 @@ public class OrderMapper {
                 orderDto.getPayment(),
                 orderDto.getCounty(),
                 orderDto.getCity(),
-                orderDto.getStreet()
+                orderDto.getStreet(),
+                new Timestamp(System.currentTimeMillis())
         );
     }
 
@@ -52,7 +57,8 @@ public class OrderMapper {
                 order.getPayment(),
                 order.getCounty(),
                 order.getCity(),
-                order.getStreet()
+                order.getStreet(),
+                order.getCreatedAt()
         );
         dto.setId(order.getId());
         return dto;
