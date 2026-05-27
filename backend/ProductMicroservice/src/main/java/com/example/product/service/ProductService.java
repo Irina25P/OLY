@@ -76,7 +76,12 @@ public class ProductService {
                 new ChangedStockMessageDto(
                         savedProduct.getId(),
                         savedProduct.getStock(),
-                        savedProduct.getPrice()
+                        savedProduct.getPrice(),
+                        savedProduct.getName(),
+                        savedProduct.getCategory() != null ? savedProduct.getCategory().name() : null,
+                        savedProduct.getSeller() != null ? savedProduct.getSeller().getId() : null,
+                        savedProduct.getImageNames() != null && !savedProduct.getImageNames().isEmpty()
+                                ? savedProduct.getImageNames().get(0) : null
                 )
         );
 
@@ -107,7 +112,12 @@ public class ProductService {
                 new ChangedStockMessageDto(
                         updatedProduct.getId(),
                         updatedProduct.getStock(),
-                        updatedProduct.getPrice()
+                        updatedProduct.getPrice(),
+                        updatedProduct.getName(),
+                        updatedProduct.getCategory() != null ? updatedProduct.getCategory().name() : null,
+                        updatedProduct.getSeller() != null ? updatedProduct.getSeller().getId() : null,
+                        updatedProduct.getImageNames() != null && !updatedProduct.getImageNames().isEmpty()
+                                ? updatedProduct.getImageNames().get(0) : null
                 )
         );
 
@@ -138,7 +148,12 @@ public class ProductService {
                 new ChangedStockMessageDto(
                         product.getId(),
                         product.getStock(),
-                        product.getPrice()
+                        product.getPrice(),
+                        product.getName(),
+                        product.getCategory() != null ? product.getCategory().name() : null,
+                        product.getSeller() != null ? product.getSeller().getId() : null,
+                        product.getImageNames() != null && !product.getImageNames().isEmpty()
+                                ? product.getImageNames().get(0) : null
                 )
         );
 
@@ -166,7 +181,12 @@ public class ProductService {
                 new ChangedStockMessageDto(
                         updatedProduct.getId(),
                         updatedProduct.getStock(),
-                        updatedProduct.getPrice()
+                        updatedProduct.getPrice(),
+                        updatedProduct.getName(),
+                        updatedProduct.getCategory() != null ? updatedProduct.getCategory().name() : null,
+                        updatedProduct.getSeller() != null ? updatedProduct.getSeller().getId() : null,
+                        updatedProduct.getImageNames() != null && !updatedProduct.getImageNames().isEmpty()
+                                ? updatedProduct.getImageNames().get(0) : null
                 )
         );
         return mapToResponseDto(updatedProduct);
@@ -249,7 +269,44 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         product.setStock(dto.getStock());
+        Product savedProduct = productRepository.save(product);
 
-        productRepository.save(product);
+        productEventProducer.sendProductUpdated(
+            new ChangedStockMessageDto(
+                savedProduct.getId(),
+                savedProduct.getStock(),
+                savedProduct.getPrice(),
+                savedProduct.getName(),
+                savedProduct.getCategory() != null ? savedProduct.getCategory().name() : null,
+                savedProduct.getSeller() != null ? savedProduct.getSeller().getId() : null,
+                savedProduct.getImageNames() != null && !savedProduct.getImageNames().isEmpty()
+                    ? savedProduct.getImageNames().get(0) : null
+            )
+        );
+    }
+
+    public void applyDynamicPrice(UUID productId, Double newPrice) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+
+        if (newPrice == null || newPrice <= 0) {
+            throw new RuntimeException("New price must be greater than 0");
+        }
+
+        product.setPrice(newPrice);
+        Product savedProduct = productRepository.save(product);
+
+        productEventProducer.sendProductUpdated(
+                new ChangedStockMessageDto(
+                        savedProduct.getId(),
+                        savedProduct.getStock(),
+                        savedProduct.getPrice(),
+                        savedProduct.getName(),
+                        savedProduct.getCategory() != null ? savedProduct.getCategory().name() : null,
+                        savedProduct.getSeller() != null ? savedProduct.getSeller().getId() : null,
+                        savedProduct.getImageNames() != null && !savedProduct.getImageNames().isEmpty()
+                                ? savedProduct.getImageNames().get(0) : null
+                )
+        );
     }
 }

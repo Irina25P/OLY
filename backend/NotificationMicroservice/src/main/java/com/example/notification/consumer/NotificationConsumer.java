@@ -26,7 +26,7 @@ public class NotificationConsumer {
         try {
             LOGGER.info("Received add product message from queue: {}", message);
 
-            NotificationDto notificationDto = objectMapper.readValue(message, NotificationDto.class);
+            NotificationDto notificationDto = objectMapper.readValue(normalizePayload(message), NotificationDto.class);
 
             notificationWebSocketService.createAndSendNotification(notificationDto, Topic.RECEIVED_ORDER);
         } catch (Exception e) {
@@ -39,7 +39,7 @@ public class NotificationConsumer {
         try {
             LOGGER.info("Received add product message from queue: {}", message);
 
-            NotificationDto notificationDto = objectMapper.readValue(message, NotificationDto.class);
+            NotificationDto notificationDto = objectMapper.readValue(normalizePayload(message), NotificationDto.class);
 
             notificationWebSocketService.createAndSendNotification(notificationDto, Topic.UPDATE_ORDER);
         } catch (Exception e) {
@@ -52,11 +52,24 @@ public class NotificationConsumer {
         try {
             LOGGER.info("Received add product message from queue: {}", message);
 
-            NotificationDto notificationDto = objectMapper.readValue(message, NotificationDto.class);
+            NotificationDto notificationDto = objectMapper.readValue(normalizePayload(message), NotificationDto.class);
 
             notificationWebSocketService.createAndSendNotification(notificationDto, Topic.RECEIVED_REVIEW);
         } catch (Exception e) {
             System.err.println("Eroare la procesarea notificării reviewCreated: " + e.getMessage());
         }
+    }
+
+    private String normalizePayload(String message) throws Exception {
+        if (message == null) {
+            return null;
+        }
+
+        String trimmed = message.trim();
+        if (trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+            return objectMapper.readValue(trimmed, String.class);
+        }
+
+        return message;
     }
 }

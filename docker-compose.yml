@@ -153,6 +153,8 @@ services:
       RABBITMQ_SYNC_ROUTINGKEY_DELETEIMAGE: deleteImage
       RABBITMQ_SYNC_UNIQUE_NAME: product-service
       RABBITMQ_SYNC_ROUTINGKEY_REVIEW_CREATED: reviewCreated
+      RABBITMQ_SYNC_EXCHANGE_PRICE_UPDATE_TOPIC: price-update-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_PRICE_UPDATE: priceUpdate
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -192,6 +194,8 @@ services:
       RABBITMQ_SYNC_ROUTINGKEY_DELETEPRODUCT: deleteProduct
       RABBITMQ_SYNC_ROUTINGKEY_ORDER_CREATED: orderCreated
       RABBITMQ_SYNC_ROUTINGKEY_ORDER_UPDATED: orderUpdated
+      RABBITMQ_SYNC_EXCHANGE_ORDER_EVENT_TOPIC: order-event-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_EVENT: orderEvent
       RABBITMQ_SYNC_UNIQUE_NAME: order-service
     depends_on:
       rabbitmq:
@@ -255,8 +259,95 @@ services:
     networks:
       - oly_net
 
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j
+    restart: always
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/password123
+    volumes:
+      - neo4j-data:/data
+    networks:
+      - oly_net
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password123", "RETURN 1"]
+      interval: 10s
+      retries: 10
+
+  recommendation-service:
+    build:
+      context: ./backend/RecommendationMicroservice
+      dockerfile: Dockerfile
+    container_name: recommendation-service
+    restart: always
+    ports:
+      - "8087:8080"
+    environment:
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password123
+      PORT: 8080
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_ORDER_EVENT_TOPIC: order-event-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_EVENT: orderEvent
+      RABBITMQ_SYNC_EXCHANGE_PRODUCT_TOPIC: product-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ADDPRODUCT: addProduct
+      RABBITMQ_SYNC_ROUTINGKEY_UPDATEPRODUCT: updateProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEPRODUCT: deleteProduct
+      RABBITMQ_SYNC_UNIQUE_NAME: recommendation-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    networks:
+      - oly_net
+
+  dynamic-pricing-service:
+    build:
+      context: ./backend/DynamicPricingMicroservice
+      dockerfile: Dockerfile
+    container_name: dynamic-pricing-service
+    restart: always
+    ports:
+      - "8088:8080"
+    environment:
+      DB_IP: 92.5.49.167
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_DBNAME: db_pricing
+      PORT: 8080
+      SECURITY_USERNAME_HEADER: Username-Header
+      SECURITY_ROLE_HEADER: Role-Header
+      SECURITY_USER_ID_HEADER: UserId-Header
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_SYNC_EXCHANGE_ORDER_EVENT_TOPIC: order-event-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ORDER_EVENT: orderEvent
+      RABBITMQ_SYNC_EXCHANGE_PRODUCT_TOPIC: product-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_ADDPRODUCT: addProduct
+      RABBITMQ_SYNC_ROUTINGKEY_UPDATEPRODUCT: updateProduct
+      RABBITMQ_SYNC_ROUTINGKEY_DELETEPRODUCT: deleteProduct
+      RABBITMQ_SYNC_EXCHANGE_PRICE_UPDATE_TOPIC: price-update-Topic-Exchange
+      RABBITMQ_SYNC_ROUTINGKEY_PRICE_UPDATE: priceUpdate
+      RABBITMQ_SYNC_UNIQUE_NAME: dynamic-pricing-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - oly_net
+
 volumes:
   rabbitmq-data:
+  neo4j-data:
 
 networks:
   oly_net:

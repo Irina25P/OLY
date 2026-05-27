@@ -22,10 +22,23 @@ public class StockConsumer {
     @RabbitListener(queues = "${rabbitmq.sync.exchange.changeStock.topic}.${rabbitmq.sync.queue.unique.name}.${rabbitmq.sync.routingKey.changeStock}")
     public void receiveStockUpdate(String message) {
         try {
-            OrderStockUpdateMessageDto receivedMessage = objectMapper.readValue(message, OrderStockUpdateMessageDto.class);
+            OrderStockUpdateMessageDto receivedMessage = objectMapper.readValue(normalizePayload(message), OrderStockUpdateMessageDto.class);
             productService.updateStockFromOrder(receivedMessage);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private String normalizePayload(String message) throws Exception {
+        if (message == null) {
+            return null;
+        }
+
+        String trimmed = message.trim();
+        if (trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+            return objectMapper.readValue(trimmed, String.class);
+        }
+
+        return message;
     }
 }

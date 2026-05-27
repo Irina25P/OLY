@@ -44,6 +44,12 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.sync.queue.unique.name}")
     private String uniqueQueueName;
 
+    @Value("${rabbitmq.sync.exchange.price.update.topic}")
+    private String priceUpdateExchange;
+
+    @Value("${rabbitmq.sync.routingkey.priceUpdate}")
+    private String priceUpdateRoutingKey;
+
     @Bean
     public TopicExchange userTopicExchange() {
         return new TopicExchange(userExchange, true, false);
@@ -118,5 +124,23 @@ public class RabbitMQConfig {
                 .bind(deleteUserQueue())
                 .to(userTopicExchange())
                 .with(deleteUserRoutingKey);
+    }
+
+    @Bean
+    public TopicExchange priceUpdateTopicExchange() {
+        return new TopicExchange(priceUpdateExchange, true, false);
+    }
+
+    @Bean
+    public Queue priceUpdateQueue() {
+        return new Queue(priceUpdateExchange + "." + uniqueQueueName + "." + priceUpdateRoutingKey, true, false, false);
+    }
+
+    @Bean
+    public Binding priceUpdateBinding() {
+        return BindingBuilder
+                .bind(priceUpdateQueue())
+                .to(priceUpdateTopicExchange())
+                .with(priceUpdateRoutingKey);
     }
 }

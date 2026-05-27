@@ -81,6 +81,26 @@ http:
         - strip-api-prefix
       service: auth-service
 
+    recommendations-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/recommendations`)"
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - jwt-auth-forwarder
+        - strip-api-prefix
+      service: recommendation-service
+
+    pricing-api:
+      rule: "(Host(`localhost`) || Host(`traefik`)) && PathPrefix(`/api/v1/pricing`)"
+      entryPoints:
+        - web
+      middlewares:
+        - cors-headers
+        - jwt-auth-forwarder
+        - strip-api-prefix
+      service: dynamic-pricing-service
+
 
 
   middlewares:
@@ -149,3 +169,13 @@ http:
       loadBalancer:
         servers:
           - url: "http://notification-service:8080"
+
+    recommendation-service:
+      loadBalancer:
+        servers:
+          - url: "http://recommendation-service:8080"
+
+    dynamic-pricing-service:
+      loadBalancer:
+        servers:
+          - url: "http://dynamic-pricing-service:8080"

@@ -13,6 +13,7 @@ import ProductCatalogPage from "../pages/product/ProductCatalogPage"
 import ProductDetailPage from "../pages/product/ProductDetailPage"
 import ClientProfile from "../pages/dashboard/ClientProfile"
 import CheckoutPage from "../pages/clients/CheckoutPage"
+import RecommendationsPage from "../pages/clients/RecommendationsPage"
 
 import SellerOverviewPage from "../pages/seller/SellerOverviewPage"
 import SellerProductsPage from "../pages/seller/SellerProductsPage"
@@ -20,6 +21,7 @@ import SellerOrdersPage from "../pages/seller/SellerOrdersPage"
 import SellerAnalyticsPage from "../pages/seller/SellerAnalyticsPage"
 import SellerReviewsPage from "../pages/seller/SellerReviewsPage"
 import SellerSettingsPage from "../pages/seller/SellerSettingsPage"
+import SellerPricingPage from "../pages/seller/SellerPricingPage"
 import OrderTracking from "../pages/clients/OrderTracking.tsx";
 import PlatformOverview from "../pages/admin/PlatformOverview.tsx";
 
@@ -63,6 +65,15 @@ function AppRouter() {
                     />
 
                     <Route
+                        path="/recommendations"
+                        element={
+                            <ProtectedRoute allowedRoles={["CLIENT"]}>
+                                <RecommendationsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
                         path="/dashboard"
                         element={
                             <ProtectedRoute>
@@ -96,6 +107,7 @@ function AppRouter() {
                     <Route path="/seller/analytics" element={<SellerAnalyticsPage />} />
                     <Route path="/seller/reviews" element={<SellerReviewsPage />} />
                     <Route path="/seller/settings" element={<SellerSettingsPage />} />
+                    <Route path="/seller/pricing" element={<SellerPricingPage />} />
                 </Route>
             </Routes>
         </AuthProvider>

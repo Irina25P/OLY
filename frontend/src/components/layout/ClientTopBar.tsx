@@ -37,6 +37,9 @@ const ClientTopBar = () => {
             {(user === null || user?.role !== "ADMIN") && (
                 <nav className="flex gap-8 mx-8">
                     <Link to="/products" className={getLinkClass('/products')}>Products</Link>
+                    {user?.role === "CLIENT" && (
+                        <Link to="/recommendations" className={getLinkClass('/recommendations')}>For You</Link>
+                    )}
                     <Link to="/orders" className={getLinkClass('/orders')}>Orders</Link>
                     <Link to="/profile" className={getLinkClass('/profile')}>Profile</Link>
                 </nav>

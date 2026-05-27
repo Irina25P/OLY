@@ -42,6 +42,9 @@ public class OrderService {
     @Value("${rabbitmq.sync.exchange.notification.topic}")
     private String syncExchangeNotificationTopic;
 
+    @Value("${rabbitmq.sync.exchange.order.event.topic}")
+    private String syncExchangeOrderEventTopic;
+
     @Value("${rabbitmq.sync.routingkey.changeStock}")
     private String routingKeyChangeStock;
 
@@ -50,6 +53,9 @@ public class OrderService {
 
     @Value("${rabbitmq.sync.routingkey.updateOrder}")
     private String routingKeyUpdateOrder;
+
+    @Value("${rabbitmq.sync.routingkey.orderEvent}")
+    private String routingKeyOrderEvent;
 
     public OrderService(
             OrderRepository orderRepository,
@@ -133,6 +139,21 @@ public class OrderService {
             LOGGER.info("Sent order created message for order id {}: {}", order.getId(), orderMessage);
         } catch (Exception e){
             LOGGER.error("Error while sending order created message for order id {}", order.getId(), e);
+        }
+
+        try {
+            OrderEventMessage orderEventMessage = new OrderEventMessage(
+                    order.getId(),
+                    orderDto.getClientId(),
+                    orderDto.getSellerId(),
+                    order.getCreatedAt(),
+                    orderProducts
+            );
+            String eventJson = objectMapper.writeValueAsString(orderEventMessage);
+            rabbitTemplate.convertAndSend(syncExchangeOrderEventTopic, routingKeyOrderEvent, eventJson);
+            LOGGER.info("Sent order event message for order id {}", order.getId());
+        } catch (Exception e) {
+            LOGGER.error("Error while sending order event message for order id {}", order.getId(), e);
         }
 
         return "Your order has been placed successfully!";

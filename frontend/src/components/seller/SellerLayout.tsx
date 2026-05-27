@@ -7,6 +7,7 @@ import {
     LogOut,
     MessageSquareText,
     Settings,
+    Tag,
 } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
@@ -20,6 +21,7 @@ const navItems = [
     { label: "Orders", path: "/seller/orders", icon: ClipboardList },
     { label: "Analytics", path: "/seller/analytics", icon: BarChart3 },
     { label: "Reviews", path: "/seller/reviews", icon: MessageSquareText },
+    { label: "AI Pricing", path: "/seller/pricing", icon: Tag },
     { label: "Settings", path: "/seller/settings", icon: Settings },
 ];
 

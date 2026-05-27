@@ -41,6 +41,15 @@ public class RabbitMQConfig {
     private String deleteProductRoutingKey;
 
     /**
+     * order event topic for recommendation and pricing services
+     */
+    @Value("${rabbitmq.sync.exchange.order.event.topic}")
+    private String orderEventTopicExchange;
+
+    @Value("${rabbitmq.sync.routingkey.orderEvent}")
+    private String orderEventRoutingKey;
+
+    /**
      * notification topic
      */
 
@@ -133,5 +142,10 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(deleteProductQueue())
                 .to(productTopicExchange())
                 .with(deleteProductRoutingKey);
+    }
+
+    @Bean
+    public TopicExchange orderEventTopicExchange() {
+        return new TopicExchange(orderEventTopicExchange, true, false);
     }
 }
